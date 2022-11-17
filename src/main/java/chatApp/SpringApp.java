@@ -12,6 +12,8 @@ import java.security.GeneralSecurityException;
 public class SpringApp {
     public static void main(String[] args) throws MessagingException, GeneralSecurityException, IOException {
         SpringApplication.run(SpringApp.class, args);
+
         EmailSenderService.sendMail("blah","blah","bakskatz75@gmail.com");
+
     }
 }
