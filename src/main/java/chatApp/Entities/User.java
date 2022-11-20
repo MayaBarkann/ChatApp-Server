@@ -9,7 +9,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String username;
     @Column(unique = true)
     private String email;
@@ -17,10 +17,6 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserType userType;
 
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public int getId() {
         return id;
@@ -30,27 +26,20 @@ public class User {
         return username;
     }
 
-    public void setUsername(String name) {
-        this.username = name;
-    }
     public String getEmail() {
         return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public UserType getUserType() {
         return userType;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public void setUserType(UserType userType) {
@@ -83,8 +72,9 @@ public class User {
     public String toString() {
         return "User{" +
                 "id=" + id +
-                ", name='" + username + '\'' +
+                ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
+                ", userType=" + userType +
                 '}';
     }
 }
