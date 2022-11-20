@@ -15,21 +15,39 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-
     @Autowired
     private EmailActivationService emailActivationService;
 
     /**
+     * Activates the addUser() method of UserService, if successful activates sendActivationEmail() method of EmailActivationService.
      *
      * @param user
      * @return ResponseEntity<String>, will hold: if action succeeded - saved user data; if action failed:reason for failure
      */
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST, value = "/register")
     public ResponseEntity<String> createUser(@RequestBody User user) {
-        Response response = userService.addUser(user);
+        Response responseUser = userService.addUser(user);
+        if (responseUser.isSucceed()) {
+            Response responseEmail = emailActivationService.sendActivationEmail(user.getEmail());
+            if (!responseEmail.isSucceed()) {
+                return ResponseEntity.badRequest().body("Problem sending activation email to address: " + responseEmail.getMessage());
+            }
+            return ResponseEntity.ok("User added successfully: " + UserToPresent.createFromUser(user).toString() + "\nActivation email was sent to: " + user.getEmail());
+        }
+        return ResponseEntity.badRequest().body(responseUser.getMessage());
+    }
+
+    /**
+     * Activates the activateUser() method of EmailActivationService.
+     *
+     * @param activationToken
+     * @return ResponseEntity<String>, contains: if action succeeded - success message; if action failed - message with reason of failure
+     */
+    @RequestMapping(method = RequestMethod.GET, value = "/activate/{activationToken}")
+    public ResponseEntity<String> activateUser(@PathVariable("activationToken") String activationToken) {
+        Response response = emailActivationService.activateUser(activationToken);
         if (response.isSucceed()) {
-            emailActivationService.sendActivationMail(user.getEmail());
-            return ResponseEntity.ok("User added successfully: " + UserToPresent.createFromUser(user).toString());
+            return ResponseEntity.ok("Account with email " + response.getData().toString() + " was activated successfully.");
         }
         return ResponseEntity.badRequest().body(response.getMessage());
     }

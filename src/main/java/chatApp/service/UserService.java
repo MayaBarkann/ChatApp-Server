@@ -12,20 +12,16 @@ import java.sql.SQLDataException;
 
 @Service
 public class UserService {
-
-
     private final UserRepository userRepository;
-
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
-
 
     /**
      * Adds a user to the database if it has a unique email and unique username
      *
      * @param user - the user's data
-     * @return a Response, will hold: if action succeeded - data=saved user, isSucceeded=true, message=null; if action failed - data = null. isSucceeded = false, message=reason for failure
+     * @return a Response, contains: if action succeeded - data=saved user, isSucceeded=true, message=null; if action failed - data = null. isSucceeded = false, message=reason for failure
      */
     public Response addUser(User user) {
         if (userRepository.findByEmail(user.getEmail()) != null) {
