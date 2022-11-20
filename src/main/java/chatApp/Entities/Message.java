@@ -8,6 +8,30 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 public class Message {
+    private static final int MainRoomId=-1;
+    Message()
+    {
+
+    }
+    private Message(int senderId,int receiverId,String content,LocalDate sendTime)
+    {
+        this.senderId=senderId;
+        this.receiverId=receiverId;
+        this.content=content;
+        this.time=sendTime;
+    }
+    public static Message createPersonalMessage(int senderId,int receiverId,String content,LocalDate sendTime)
+    {
+        Message message = new Message(senderId, receiverId, content, sendTime);
+        message.messageType =MessageType.PERSONAL;
+        return message;
+    }
+    public static Message createMainRoomMessage(int senderId,String content,LocalDate sendTime)
+    {
+        Message message = new Message(senderId, MainRoomId, content, sendTime);
+        message.messageType=MessageType.MAIN_ROOM;
+        return message;
+    }
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
@@ -16,10 +40,12 @@ public class Message {
     private int senderId; //TODO: add not null to column?
     private int receiverId;
     private LocalDate time; //TODO: add not null to column?
+    private MessageType messageType;
 
     public int getId() {
         return id;
     }
+    public MessageType getType(){return messageType;}
 
     public String getContent() {
         return content;
