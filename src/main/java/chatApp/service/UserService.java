@@ -29,6 +29,9 @@ public class UserService {
         if(userRepository.findByEmail(user.getEmail())!=null){
             throw new SQLDataException(String.format("Email %s exists in users table", user.getEmail()));
         }
+        if(userRepository.findByUsername(user.getUsername())!=null){
+            throw new SQLDataException(String.format("Username %s exists in users table", user.getUsername()));
+        }
         return userRepository.save(user);
     }
 }

@@ -23,7 +23,7 @@ public class UserController {
             return userService.addUser(user).toString();
         } catch (SQLDataException e) {
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, "Email already exists", e);
+                    HttpStatus.BAD_REQUEST, "Email or username already exist", e);
         }
     }
 }

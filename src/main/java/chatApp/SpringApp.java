@@ -2,6 +2,7 @@ package chatApp;
 
 import chatApp.Entities.User;
 import chatApp.Entities.UserType;
+import chatApp.controller.UserController;
 import chatApp.repository.UserRepository;
 import chatApp.service.EmailSenderService;
 import chatApp.service.UserService;
@@ -26,7 +27,6 @@ import java.util.function.Function;
 public class SpringApp {
     public static void main(String[] args) throws MessagingException, GeneralSecurityException, IOException {
         SpringApplication.run(SpringApp.class, args);
-
         //EmailSenderService.sendMail("new Message","my new message.","itamar124812@gmail.com");
     }
 }
