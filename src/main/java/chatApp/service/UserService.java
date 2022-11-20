@@ -1,6 +1,8 @@
 package chatApp.service;
 
+import chatApp.Entities.Response;
 import chatApp.Entities.User;
+import chatApp.Entities.UserType;
 import chatApp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
@@ -20,18 +22,24 @@ public class UserService {
 
 
     /**
-     * Adds a user to the database if it has a unique email
+     * Adds a user to the database if it has a unique email and unique username
+     *
      * @param user - the user's data
-     * @return a saved user with it's generated id
-     * @throws SQLDataException when the provided email already exists
+     * @return a Response, will hold: if action succeeded - data=saved user, isSucceeded=true, message=null; if action failed - data = null. isSucceeded = false, message=reason for failure
      */
-    public User addUser(User user) throws SQLDataException {
-        if(userRepository.findByEmail(user.getEmail())!=null){
-            throw new SQLDataException(String.format("Email %s exists in users table", user.getEmail()));
+    public Response addUser(User user) {
+        if (userRepository.findByEmail(user.getEmail()) != null) {
+            return Response.createFailureResponse(String.format("Email %s exists in users table", user.getEmail()));
         }
-        if(userRepository.findByUsername(user.getUsername())!=null){
-            throw new SQLDataException(String.format("Username %s exists in users table", user.getUsername()));
+        if (userRepository.findByUsername(user.getUsername()) != null) {
+            return Response.createFailureResponse(String.format("Username %s exists in users table", user.getUsername()));
         }
-        return userRepository.save(user);
+        if (user.getUsername() == null) {
+            return Response.createFailureResponse(String.format("Username can't be null"));
+        }
+        user.setUserType(UserType.NOT_ACTIVATED);
+        userRepository.save(user);
+
+        return Response.createSuccessfulResponse(user);
     }
 }
