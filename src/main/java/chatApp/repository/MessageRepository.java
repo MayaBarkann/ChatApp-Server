@@ -9,7 +9,7 @@ import java.util.List;
 
 @Repository
 public interface MessageRepository extends JpaRepository<Message, Integer> {
-    public List<Message> findBySenderIdAndReceiverIdAAndMessageType(int senderId, int reciverId,MessageType type);
+    public List<Message> findBySenderIdAndReceiverIdAndMessageType(int senderId, int reciverId,MessageType type);
     public List<Message> findByMessageType(MessageType type);
     public List<Message> findBySenderId(int senderId);
     public List<Message> findByReceiverId(int reciverId);
