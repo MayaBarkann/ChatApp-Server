@@ -9,11 +9,13 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
-    private String name;
+    @Column(unique = true)
+    private String username;
     @Column(unique = true)
     private String email;
     private String password;
-
+    @Enumerated(EnumType.STRING)
+    private UserType userType;
 
 
     public void setId(int id) {
@@ -24,14 +26,13 @@ public class User {
         return id;
     }
 
-    public String getName() {
-        return name;
+    public String getUsername() {
+        return username;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setUsername(String name) {
+        this.username = name;
     }
-
     public String getEmail() {
         return email;
     }
@@ -48,6 +49,14 @@ public class User {
         this.password = password;
     }
 
+    public UserType getUserType() {
+        return userType;
+    }
+
+    public void setUserType(UserType userType) {
+        this.userType = userType;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -56,7 +65,7 @@ public class User {
         User user = (User) o;
 
         if (id != user.id) return false;
-        if (!Objects.equals(name, user.name)) return false;
+        if (!Objects.equals(username, user.username)) return false;
         if (!Objects.equals(email, user.email)) return false;
         return Objects.equals(password, user.password);
     }
@@ -64,7 +73,7 @@ public class User {
     @Override
     public int hashCode() {
         int result = id;
-        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (username != null ? username.hashCode() : 0);
         result = 31 * result + (email != null ? email.hashCode() : 0);
         result = 31 * result + (password != null ? password.hashCode() : 0);
         return result;
@@ -74,9 +83,8 @@ public class User {
     public String toString() {
         return "User{" +
                 "id=" + id +
-                ", name='" + name + '\'' +
+                ", name='" + username + '\'' +
                 ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
                 '}';
     }
 }
