@@ -2,6 +2,7 @@ package chatApp.service;
 
 import chatApp.Entities.Message;
 import chatApp.Entities.MessageType;
+import chatApp.Entities.Response;
 import chatApp.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,9 +48,12 @@ public class MessageService {
     {
         return messageRepo.findByMessageType(MessageType.MAIN_ROOM);
     }
-    public File exportUserMessages(String fileName,int userId,LocalDate startDateTime,LocalDateTime endDate)
+    public Response<File> exportUserMessages(String fileName, int userId, LocalDate startDateTime, LocalDateTime endDate)
     {
-        return null;
+        List<Message> result=new ArrayList<>();
+        result.addAll(messageRepo.findBySenderId(userId));
+        result.addAll(messageRepo.findByReceiverId(userId));
+        return FileWriter.writeListToFile(fileName,result);
     }
     public List<Message> getChannelMessages(int senderId,int reciverId)
     {
