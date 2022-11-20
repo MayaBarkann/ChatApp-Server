@@ -10,13 +10,13 @@ public class Response<T> {
         this.isSucceed=isSucceed;
         this.message=message;
     }
-    public static<T> Response createSuccessfulResponse(T data)
+    public static<T> Response<T> createSuccessfulResponse(T data)
     {
-        return  new Response(true,data,null);
+        return  new Response<>(true,data,null);
     }
-    public  static <T> Response createFailureResponse(String message)
+    public  static <T> Response<T> createFailureResponse(String message)
     {
-        return  new Response(false,null,message);
+        return  new Response<>(false,null,message);
     }
     public boolean isSucceed()
     {
