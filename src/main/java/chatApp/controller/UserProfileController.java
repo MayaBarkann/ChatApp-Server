@@ -21,10 +21,10 @@ public class UserProfileController {
         return userProfileService.upload(multipartFile, id);
     }
 
-    @PostMapping("/pic/{fileName}")
-    public Object download(@PathVariable String fileName) throws IOException {
-        //logger.info("HIT -/download | File Name : {}", fileName);
-        return userProfileService.download(fileName);
-    }
+//    @PostMapping("/pic/{fileName}")
+//    public Object download(@PathVariable String fileName) throws IOException {
+//        //logger.info("HIT -/download | File Name : {}", fileName);
+//        return userProfileService.download(fileName);
+//    }
 
 }
