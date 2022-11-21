@@ -4,16 +4,13 @@ import chatApp.Entities.Response;
 import chatApp.Entities.User;
 import chatApp.Entities.UserType;
 import chatApp.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
-
-import java.sql.SQLDataException;
 import java.util.Optional;
 
 @Service
 public class UserService {
     private final UserRepository userRepository;
+
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
@@ -32,8 +29,9 @@ public class UserService {
             return Response.createFailureResponse(String.format("Username %s exists in users table", user.getUsername()));
         }
         if (user.getUsername() == null) {
-            return Response.createFailureResponse(String.format("Username can't be null"));
+            return Response.createFailureResponse("Username can't be null");
         }
+        user.setPassword(ServiceUtil.encryptPassword(user.getPassword()));
         user.setUserType(UserType.NOT_ACTIVATED);
         userRepository.save(user);
 
