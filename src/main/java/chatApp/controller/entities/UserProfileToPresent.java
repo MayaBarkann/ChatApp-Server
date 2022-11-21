@@ -2,7 +2,6 @@ package chatApp.controller.entities;
 
 import chatApp.Entities.User;
 import chatApp.Entities.UserProfile;
-import javax.persistence.Entity;
 import java.time.LocalDate;
 
 public class UserProfileToPresent {
