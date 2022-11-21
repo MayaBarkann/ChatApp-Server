@@ -1,5 +1,6 @@
 package chatApp.controller;
 
+import chatApp.Entities.Response;
 import chatApp.service.UserProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -15,11 +16,17 @@ public class UserProfileController {
     @Autowired
     private UserProfileService userProfileService;
 
-    @PostMapping("/pic")
-    public Object upload(@RequestParam("file") MultipartFile multipartFile, @RequestHeader("id") int id) {
-        //logger.info("HIT -/upload | File Name : {}", multipartFile.getOriginalFilename());
-        return userProfileService.upload(multipartFile, id);
+    @PostMapping("/upload")
+    public Response<String> upload(@PathVariable(name="path") String filePath, @PathVariable(name="id") String id) throws Exception{
+        return userProfileService.upload(filePath, id);
     }
+
+//    @PostMapping("/upload")
+//    @ResponseBody
+//    public Response<String> upload(@RequestParam("file") MultipartFile multipartFile, @RequestHeader("id") int id) {
+//        //logger.info("HIT -/upload | File Name : {}", multipartFile.getOriginalFilename());
+//        return userProfileService.upload(multipartFile, id);
+//    }
 
 //    @PostMapping("/pic/{fileName}")
 //    public Object download(@PathVariable String fileName) throws IOException {

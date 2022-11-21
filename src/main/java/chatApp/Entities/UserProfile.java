@@ -9,13 +9,16 @@ import java.time.LocalDate;
 @Table(name = "userProfile")
 public class UserProfile {
     @Id  //TODO: how do i make sure that the id exists in the user repository
-    private final int id;
+    private int id;
     private String firstName;
     private String lastName;
     private LocalDate dateOfBirth;
     private String description;
 
-    public UserProfile(int id){
+    public UserProfile() {
+    }
+
+    public UserProfile(int id) {
         this.id = id;
     }
 

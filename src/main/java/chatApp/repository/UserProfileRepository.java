@@ -1,8 +1,8 @@
 package chatApp.repository;
 import chatApp.Entities.UserProfile;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface UserProfileRepository {
-    public interface UserRepository extends JpaRepository<UserProfile, Integer> {
-    }
+@Repository
+public interface UserProfileRepository extends JpaRepository<UserProfile, Integer>{
 }
