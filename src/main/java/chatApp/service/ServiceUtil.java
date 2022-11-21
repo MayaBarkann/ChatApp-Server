@@ -10,6 +10,12 @@ public class ServiceUtil {
         return theDate.isAfter(startDate) && theDate.isBefore(endDate);
     }
 
+    /**
+     * Encrypts a given password String using the BCryptPasswordEncoder() Spring Security method.
+     *
+     * @param password String to be encrypted.
+     * @return String containing the encrypted password.
+     */
     public static String encryptPassword(String password){
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         return passwordEncoder.encode(password);
