@@ -1,4 +1,4 @@
-package chatApp.controller;
+package chatApp.controller.entities;
 
 import chatApp.Entities.User;
 import chatApp.Entities.UserType;

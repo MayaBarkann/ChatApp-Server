@@ -7,5 +7,5 @@ public enum UserActions {
     ReceiveMainRoomMessage,
     MuteOthers,
     UnmuteOthers,
-    HasProfile;
+    HasProfile,
 }

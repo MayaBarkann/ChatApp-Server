@@ -14,13 +14,22 @@ public class UserProfile {
     private String lastName;
     private LocalDate dateOfBirth;
     private String description;
+    private boolean isPublic;
+    private String imageUrl;
 
-    public UserProfile() {
-    }
+    public UserProfile() { }
 
     public UserProfile(int id) {
         this.id = id;
     }
+
+    public String getImageUrl() { return imageUrl; }
+
+    public void setImageUrl(String photoUrl) { this.imageUrl = photoUrl; }
+
+    public boolean isPublic() { return isPublic; }
+
+    public void setPublic(boolean aPublic) { isPublic = aPublic; }
 
     public int getId() {
         return id;

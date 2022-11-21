@@ -2,6 +2,7 @@ package chatApp.controller;
 
 import chatApp.Entities.Response;
 import chatApp.Entities.User;
+import chatApp.controller.entities.UserToPresent;
 import chatApp.service.UserActivationService;
 import chatApp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
