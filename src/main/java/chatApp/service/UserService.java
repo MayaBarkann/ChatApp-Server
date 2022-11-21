@@ -9,6 +9,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLDataException;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -23,7 +24,7 @@ public class UserService {
      * @param user - the user's data
      * @return a Response, contains: if action succeeded - data=saved user, isSucceeded=true, message=null; if action failed - data = null. isSucceeded = false, message=reason for failure
      */
-    public Response addUser(User user) {
+    public Response<User> addUser(User user) {
         if (userRepository.findByEmail(user.getEmail()) != null) {
             return Response.createFailureResponse(String.format("Email %s exists in users table", user.getEmail()));
         }
@@ -38,4 +39,19 @@ public class UserService {
 
         return Response.createSuccessfulResponse(user);
     }
+
+    /**
+     * Searches for a User, with the given id, in the user table.
+     *
+     * @param id User's id to search for.
+     * @return Response object, if user was found - contains the User's object, if user doesn't exist - contains the failure message.
+     */
+    public Response<User> findUserById(int id){
+        Optional<User> user = userRepository.findById(id);
+        if(user.isPresent()){
+            return Response.createSuccessfulResponse(user.get());
+        }
+        return Response.createFailureResponse("User with id: " + id + "not found");
+    }
+
 }

@@ -7,13 +7,14 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class FileWriter {
 public static Response<File> writeListToFile(String filePath, List<?> list)
 {
-    Path path= Path.of(filePath);
+    Path path= Paths.get(filePath);
     if(!Files.exists(path)) {
        try {
            Files.createFile(path);

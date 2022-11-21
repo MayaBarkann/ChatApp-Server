@@ -37,9 +37,9 @@ public class MessageService {
 
     public List<Message> loadPublicMessages(Optional<LocalDateTime> startDateArgument, Optional<LocalDateTime> endDateArgument) {
         final LocalDateTime startDate, endDate;
-        if (startDateArgument.isEmpty()) startDate = LocalDateTime.MIN;
+        if (!startDateArgument.isPresent()) startDate = LocalDateTime.MIN;
         else startDate = startDateArgument.get();
-        if (endDateArgument.isEmpty()) endDate = LocalDateTime.now();
+        if (!endDateArgument.isPresent()) endDate = LocalDateTime.now();
         else endDate = endDateArgument.get();
         return messageRepo.findByMessageType(MessageType.MAIN_ROOM).stream()
                 .filter(message -> ServiceUtil.dateIsBetween(message.getTime(), startDate, endDate))
@@ -48,9 +48,9 @@ public class MessageService {
 
     public Response<File> exportUserMessages(String fileName, int userId, Optional<LocalDateTime> startDateArgument, Optional<LocalDateTime> endDateArgument) {
         final LocalDateTime startDate, endDate;
-        if (startDateArgument.isEmpty()) startDate = LocalDateTime.MIN;
+        if (!startDateArgument.isPresent()) startDate = LocalDateTime.MIN;
         else startDate = startDateArgument.get();
-        if (endDateArgument.isEmpty()) endDate = LocalDateTime.now();
+        if (!endDateArgument.isPresent()) endDate = LocalDateTime.now();
         else endDate = endDateArgument.get();
         List<Message> result = new ArrayList<>();
         result.addAll(messageRepo.findBySenderId(userId));
