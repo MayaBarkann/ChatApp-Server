@@ -1,8 +1,11 @@
 package chatApp.controller;
 
 import chatApp.Entities.Response;
+import chatApp.Entities.UserActions;
 import chatApp.Entities.UserProfile;
 import chatApp.controller.entities.UserProfileToPresent;
+import chatApp.controller.entities.UserToPresent;
+import chatApp.service.PermissionService;
 import chatApp.service.UserProfileService;
 import chatApp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,19 +24,18 @@ public class UserProfileController {
     private UserProfileService userProfileService;
     @Autowired
     private UserService userService;
-
-//    @PostMapping("/upload")
-//    public Response<UserProfile> uploadProfilePhoto(@RequestParam("path") String path, @RequestParam("id") int id){
-//        return userProfileService.upload(path, id);
-//    }
+    @Autowired
+    private PermissionService permissionService;
 
     @PostMapping("/edit")
     public Response<UserProfile> editUserProfile(@RequestBody UserProfile userProfile, @RequestParam("path") String localImagePath){
-        //todo: validate with permissiom that this operation is valid then no need to check if user exists
-        if (userProfile == null || !userService.userExistsById(userProfile.getId())){
+        if(userProfile == null){
             return Response.createFailureResponse("can not update user profile, user does not exists");
         }
-
+        Response<Boolean> response = permissionService.checkPermission(userProfile.getId(), UserActions.HasProfile);
+        if (!response.isSucceed()){
+            return Response.createFailureResponse("can not update user profile, this user does not have permissions for editing profile");
+        }
         return userProfileService.editUserProfile(userProfile, localImagePath);
     }
 
@@ -44,33 +46,19 @@ public class UserProfileController {
         if (!userService.userExistsById(userId)){
             return Response.createFailureResponse("user does not exists");
         } else {
-            UserProfile userProfile = userProfileService.getUserProfileById(userId).getData();
-            if(userProfile == null){
-                return Response.createFailureResponse("");
+            Response<UserProfile> responseProfile = userProfileService.getUserProfileById(userId);
+            Response<User> responseUser = userService.findUserById(userId);
+
+            if(!responseProfile.isSucceed() || !responseUser.isSucceed()){
+                return Response.createFailureResponse("could not load user profile");
             }
-            User user = userService.findUserById(userId).getData();
+
+            return Response.createSuccessfulResponse(UserProfileToPresent.createFromUserProfileAndUser(responseProfile.getData(),
+                    responseUser.getData()));
         }
 
     }
 
-    private UserProfileToPresent createUserProfileToPresentFromUserAndUserProfile(User user, UserProfile userProfile){
 
-    }
-
-
-
-
-//    @PostMapping("/upload")
-//    @ResponseBody
-//    public Response<String> upload(@RequestParam("file") MultipartFile multipartFile, @RequestHeader("id") int id) {
-//        //logger.info("HIT -/upload | File Name : {}", multipartFile.getOriginalFilename());
-//        return userProfileService.upload(multipartFile, id);
-//    }
-
-//    @PostMapping("/pic/{fileName}")
-//    public Object download(@PathVariable String fileName) throws IOException {
-//        //logger.info("HIT -/download | File Name : {}", fileName);
-//        return userProfileService.download(fileName);
-//    }
 
 }
