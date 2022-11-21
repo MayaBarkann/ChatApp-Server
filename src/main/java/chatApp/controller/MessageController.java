@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 
 @Controller
@@ -30,9 +31,7 @@ public class MessageController {
     public ResponseEntity<List<Message>> getAllMainRoomMessages(@RequestParam(required = false) LocalDateTime start,@RequestParam(required = false) LocalDateTime end)
     {
         List<Message> result;
-        if(start==null && end==null) result=messageService.loadPublicMessages();
-        else if(end==null)result=messageService.loadPublicMessages(start);
-        else result=messageService.loadPublicMessages(start, end);
+        result=messageService.loadPublicMessages(Optional.ofNullable(start),Optional.ofNullable(end));
         return  ResponseEntity.ok(result);
     }
     @GetMapping("channel/getSpecific")
@@ -41,7 +40,7 @@ public class MessageController {
         return ResponseEntity.ok(messageService.getChannelMessages(senderId, reciverId));
     }
     @PostMapping("channel/send")
-    public ResponseEntity<String> sendPersonalMessage(int senderId,int reciverID,@RequestBody String message)
+    public ResponseEntity<String> sendPersonalMessage(@RequestParam int senderId,@RequestParam int reciverID,@RequestBody String message)
     {
         Message privateMessage = messageService.createPrivateMessage(senderId, reciverID, message);
         return ResponseEntity.ok("The message was sent successfully.");
