@@ -1,13 +1,35 @@
 package chatApp.Entities;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
-
+@Entity
+@Table(name="Message")
 public class Message {
+    private static final int MainRoomId=-1;
+    public Message() {
+
+    }//Don't use.
+    private Message(int senderId,int receiverId,String content,LocalDateTime sendTime)
+    {
+        this.senderId=senderId;
+        this.receiverId=receiverId;
+        this.content=content;
+        this.time=sendTime;
+    }
+    public static Message createPersonalMessage(int senderId,int receiverId,String content,LocalDateTime sendTime)
+    {
+        Message message = new Message(senderId, receiverId, content, sendTime);
+        message.messageType =MessageType.PERSONAL;
+        return message;
+    }
+    public static Message createMainRoomMessage(int senderId,String content,LocalDateTime sendTime)
+    {
+        Message message = new Message(senderId, MainRoomId, content, sendTime);
+        message.messageType=MessageType.MAIN_ROOM;
+        return message;
+    }
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
@@ -15,11 +37,13 @@ public class Message {
     private String content;
     private int senderId; //TODO: add not null to column?
     private int receiverId;
-    private LocalDate time; //TODO: add not null to column?
+    private LocalDateTime time; //TODO: add not null to column?
+    private MessageType messageType;
 
     public int getId() {
         return id;
     }
+    public MessageType getType(){return messageType;}
 
     public String getContent() {
         return content;
@@ -33,7 +57,7 @@ public class Message {
         return receiverId;
     }
 
-    public LocalDate getTime() {
+    public LocalDateTime getTime() {
         return time;
     }
 
@@ -49,7 +73,7 @@ public class Message {
         this.receiverId = receiverId;
     }
 
-    public void setTime(LocalDate time) {
+    public void setTime(LocalDateTime time) {
         this.time = time;
     }
 
