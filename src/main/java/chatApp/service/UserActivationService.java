@@ -56,7 +56,7 @@ public class UserActivationService {
      * Checks if user can be activated, if he exists in database and isn't activated yet.
      *
      * @param email String user email by which user is searched in user table.
-     * @return Response object, if user can be activated returns the email, if user can't be activated returns error message.
+     * @return Response<String> object, if user can be activated returns the email, if user can't be activated returns error message.
      */
     private Response<String> canUserBeActivated(String email){
         User user = userRepository.findByEmail(email);
@@ -73,14 +73,14 @@ public class UserActivationService {
      * Validates the activation token, checks if email for activation exists in database and if token is not expired.
      *
      * @param activationToken String token that needs to be validated.
-     * @return Response, if action was successful - contains the user's email, if action failed - contains the failure message.
+     * @return Response<String></String>, if action was successful - contains the user's email, if action failed - contains the failure message.
      */
     private Response<String> validateActivationToken(String activationToken){
         Map<String,String> decodedParts = decodeToken(activationToken);
         if (activationToken == null || decodedParts.get("email")==null || decodedParts.get("date")==null) {
             return Response.createFailureResponse(String.format("Invalid activation token"));
         }
-        Response response = canUserBeActivated(decodedParts.get("email"));
+        Response<String> response = canUserBeActivated(decodedParts.get("email"));
         if(!response.isSucceed()){
             return response;
         }
@@ -94,7 +94,7 @@ public class UserActivationService {
      * Creates a user profile in the userprofile table with the given id.
      *
      * @param id the id of the profile to be created.
-     * @return Response object, if action successful - contains the user profile object, if action failed - contains message of failure.
+     * @return Response<UserProfile> object, if action successful - contains the user profile object, if action failed - contains message of failure.
      */
     private Response<UserProfile> createUserProfile(int id){
         UserProfile userProfile = null;
@@ -111,10 +111,10 @@ public class UserActivationService {
      * Turns user's userType from NOT_ACTIVATED to REGISTERED in the database, if the activation token is valid.
      *
      * @param activationToken the token used for verifying if the account can undergo the activation process.
-     * @return Response object, contains: if action successful - data=activated user data, isSucceed=true, message=null; if action failed - data=null, isSucceed=false, message=reason for failure.
+     * @return Response<User> object, contains: if action successful - data=activated user data, isSucceed=true, message=null; if action failed - data=null, isSucceed=false, message=reason for failure.
      */
     public Response<User> activateUser(String activationToken) {
-        Response responseTokenValidate = validateActivationToken(activationToken);
+        Response<String> responseTokenValidate = validateActivationToken(activationToken);
         if(!responseTokenValidate.isSucceed()) {
             return Response.createFailureResponse(responseTokenValidate.getMessage());
         }
@@ -123,7 +123,7 @@ public class UserActivationService {
         userRepository.save(user);
         Response responseProfileCreate = createUserProfile(user.getId());
         if(!responseProfileCreate.isSucceed()){
-            return Response.createFailureResponse(responseProfileCreate.getMessage());
+            return responseProfileCreate;
         }
         return Response.createSuccessfulResponse(user);
     }
@@ -132,17 +132,17 @@ public class UserActivationService {
      * Sends an activation email to the given email address, containing the activation link with the activation token.
      *
      * @param toEmail email address that needs to receive the activation email.
-     * @return Response object, contains: if action successful - data=user's email, isSucceed=true, message=null; if action failed - data=null, isSucceed=false, message=reason for failure.
+     * @return Response<String> object, contains: if action successful - data=user's email, isSucceed=true, message=null; if action failed - data=null, isSucceed=false, message=reason for failure.
      */
     public Response<String> sendActivationEmail(String toEmail){
-        Response response = canUserBeActivated(toEmail);
+        Response<String> response = canUserBeActivated(toEmail);
         if(!response.isSucceed()){
             return response;
         }
         String activationLink="http://localhost:8080/user/activate/"+this.newActivationToken(toEmail);
         String content = "To activate your ChatApp account, please press the following link: \n" + activationLink +"\n" + "The link will be active for the next 24 hours.";
         String subject = "Activation Email for ChatApp";
-        Response emailSenderResponse = emailSender.sendMail(subject,content,toEmail);
+        Response<String> emailSenderResponse = emailSender.sendMail(subject,content,toEmail);
         if(!emailSenderResponse.isSucceed()){
             return Response.createFailureResponse("Failed to send activation email to: " + toEmail + "." + emailSenderResponse.getMessage());
         }

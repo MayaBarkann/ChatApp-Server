@@ -26,9 +26,9 @@ public class UserController {
      */
     @RequestMapping(method = RequestMethod.POST, value = "/register")
     public ResponseEntity<String> createUser(@RequestBody User user) {
-        Response responseUser = userService.addUser(user);
+        Response<User> responseUser = userService.addUser(user);
         if (responseUser.isSucceed()) {
-            Response responseEmail = userActivationService.sendActivationEmail(user.getEmail());
+            Response<String> responseEmail = userActivationService.sendActivationEmail(user.getEmail());
             if (!responseEmail.isSucceed()) {
                 return ResponseEntity.badRequest().body("Problem sending activation email to address: " + responseEmail.getMessage());
             }
@@ -45,7 +45,7 @@ public class UserController {
      */
     @RequestMapping(method = RequestMethod.GET, value = "/activate/{activationToken}")
     public ResponseEntity<String> activateUser(@PathVariable("activationToken") String activationToken) {
-        Response response = userActivationService.activateUser(activationToken);
+        Response<User> response = userActivationService.activateUser(activationToken);
         if (response.isSucceed()) {
             return ResponseEntity.ok("Account of " + response.getData().toString() + " was activated successfully.");
         }
@@ -60,7 +60,7 @@ public class UserController {
      */
     @RequestMapping(method = RequestMethod.POST, value = "/resendActivationEmail")
     public ResponseEntity<String> resendActivationEmail(@RequestBody String email) {
-        Response responseResendEmail = userActivationService.sendActivationEmail(email);
+        Response<String> responseResendEmail = userActivationService.sendActivationEmail(email);
         if (!responseResendEmail.isSucceed()) {
             return ResponseEntity.badRequest().body("Problem resending activation email to address: " + email + ". " + responseResendEmail.getMessage());
         }

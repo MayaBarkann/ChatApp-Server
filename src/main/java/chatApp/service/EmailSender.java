@@ -80,7 +80,7 @@ public class EmailSender {
      * @param subject     Subject of email.
      * @param msg         Body of email.
      * @param destination Email address that needs to receive the email.
-     * @return Response object, contains: if action successful - data=destination email, isSucceed=true, message=null; if action failed - data=null, isSucceed=false, message=reason for failure.
+     * @return Response<String> object, contains: if action successful - data=destination email, isSucceed=true, message=null; if action failed - data=null, isSucceed=false, message=reason for failure.
      */
     public Response<String> sendMail(String subject, String msg, String destination) {
         // Encode as MIME message
