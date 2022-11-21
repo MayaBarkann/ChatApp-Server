@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class UserActivationService {
@@ -40,9 +42,31 @@ public class UserActivationService {
      * @param encodedToken the encoded String that needs to be decoded.
      * @return Decoded String
      */
-    private String decodeToken(String encodedToken){
+    private Map<String,String> decodeToken(String encodedToken){
         byte[] decodedBytes = Base64.getDecoder().decode(encodedToken);
-        return new String(decodedBytes);
+        String decodedString = new String(decodedBytes);
+        String[] decodedParts = decodedString.split("#");
+        Map<String,String> partsMap = new HashMap<>();
+        partsMap.put("email",decodedParts[0]);
+        partsMap.put("date",decodedParts[1]);
+        return partsMap;
+    }
+
+    /**
+     * Checks if user can be activated, if he exists in database and isn't activated yet.
+     *
+     * @param email String user email by which user is searched in user table.
+     * @return Response object, if user can be activated returns the email, if user can't be activated returns error message.
+     */
+    private Response<String> canUserBeActivated(String email){
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            return Response.createFailureResponse(String.format("Error activating user: Email %s doesn't exist in users table", email));
+        }
+        if (user.getUserType() != UserType.NOT_ACTIVATED) {
+            return Response.createFailureResponse(String.format("User with email %s is already activated", email));
+        }
+        return Response.createSuccessfulResponse(email);
     }
 
     /**
@@ -52,21 +76,15 @@ public class UserActivationService {
      * @return Response, if action was successful - contains the user's email, if action failed - contains the failure message.
      */
     private Response<String> validateActivationToken(String activationToken){
-        String decodedString = decodeToken(activationToken);
-        String email = decodedString.split("#")[0];
-        String dateTime = decodedString.split("#")[1];
-
-        if (activationToken == null || email==null || dateTime==null) {
+        Map<String,String> decodedParts = decodeToken(activationToken);
+        if (activationToken == null || decodedParts.get("email")==null || decodedParts.get("date")==null) {
             return Response.createFailureResponse(String.format("Invalid activation token"));
         }
-        User user = userRepository.findByEmail(email);
-        if (user == null) {
-            return Response.createFailureResponse(String.format("Error validating token: Email %s doesn't exist in users table", email));
+        Response response = canUserBeActivated(decodedParts.get("email"));
+        if(!response.isSucceed()){
+            return response;
         }
-        if (user.getUserType() != UserType.NOT_ACTIVATED) {
-            return Response.createFailureResponse(String.format("User with email %s is already activated", email));
-        }
-        if (LocalDateTime.parse(dateTime).isBefore(LocalDateTime.now())) {
+        if (LocalDateTime.parse(decodedParts.get("date")).isBefore(LocalDateTime.now())) {
             return Response.createFailureResponse(String.format("Activation token expired"));
         }
         return Response.createSuccessfulResponse(activationToken);
@@ -97,12 +115,10 @@ public class UserActivationService {
      */
     public Response<User> activateUser(String activationToken) {
         Response responseTokenValidate = validateActivationToken(activationToken);
-        String decodedString = decodeToken(activationToken);
-        String email = decodedString.split("#")[0];
         if(!responseTokenValidate.isSucceed()) {
             return Response.createFailureResponse(responseTokenValidate.getMessage());
         }
-        User user = userRepository.findByEmail(email);
+        User user = userRepository.findByEmail(decodeToken(activationToken).get("email"));
         user.setUserType(UserType.REGISTERED);
         userRepository.save(user);
         Response responseProfileCreate = createUserProfile(user.getId());
@@ -119,6 +135,10 @@ public class UserActivationService {
      * @return Response object, contains: if action successful - data=user's email, isSucceed=true, message=null; if action failed - data=null, isSucceed=false, message=reason for failure.
      */
     public Response<String> sendActivationEmail(String toEmail){
+        Response response = canUserBeActivated(toEmail);
+        if(!response.isSucceed()){
+            return response;
+        }
         String activationLink="http://localhost:8080/user/activate/"+this.newActivationToken(toEmail);
         String content = "To activate your ChatApp account, please press the following link: \n" + activationLink +"\n" + "The link will be active for the next 24 hours.";
         String subject = "Activation Email for ChatApp";
