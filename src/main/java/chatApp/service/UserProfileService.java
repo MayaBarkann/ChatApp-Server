@@ -1,6 +1,7 @@
 package chatApp.service;
 
 import chatApp.Entities.Response;
+import chatApp.Entities.User;
 import chatApp.Entities.UserProfile;
 import chatApp.repository.UserProfileRepository;
 import chatApp.repository.UserRepository;
@@ -20,6 +21,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 @Service
 public class UserProfileService {
@@ -35,19 +37,27 @@ public class UserProfileService {
     }
 
     public Response<UserProfile> getUserProfileById(int id){
+        UserProfile userProfile = userProfileRepository.findById(id);
+        if (userProfile != null){
+            return Response.createSuccessfulResponse(userProfile);
+        }
+        return Response.createFailureResponse("there is no such user");
     }
 
     public Response<UserProfile> editUserProfile(UserProfile userProfile, String localImagePath){
         if (localImagePath != null){ //TODO: CHECK ABOUT NULL OR ""
-            if (!localImagePath.isEmpty() && !uploadImage(userProfile, localImagePath)){
+            if (!localImagePath.isEmpty() && !uploadImage(userProfile, localImagePath).isSucceed()){
+
                 return Response.createFailureResponse("user profile edition failed- could not upload image to profile");
             }
         }
+
         userProfileRepository.save(userProfile);
+
         return Response.createSuccessfulResponse(userProfile);
     }
 
-    private boolean uploadImage(UserProfile userProfile, String localPath){
+    private Response<UserProfile> uploadImage(UserProfile userProfile, String localPath){
         int id = userProfile.getId();
         BlobId blobId = BlobId.of("chatapp-ec932.appspot.com",Integer.toString(id));
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
@@ -58,13 +68,14 @@ public class UserProfileService {
             String profilePhotoUrl = String.format(URL_TEMPLATE,id);
             userProfile.setImageUrl(profilePhotoUrl);
 
-            return true;
+            return Response.createSuccessfulResponse(userProfile);
 
         } catch (IOException e){
 
-            return false;
+            return Response.createFailureResponse("could not upload image " + e.getMessage());
         }
     }
+
 
     //    public Response<UserProfile> upload(String filePath, int id){
 //        BlobId blobId = BlobId.of("chatapp-ec932.appspot.com",Integer.toString(id));

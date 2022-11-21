@@ -37,7 +37,7 @@ public class UserProfileController {
         return userProfileService.editUserProfile(userProfile, localImagePath);
     }
 
-    @GetMapping("/download")
+    @GetMapping("/loadProfile")
     public Response<UserProfileToPresent> getUserProfileById(@RequestParam("id") int userId){
 
         //todo: validate with permissiom that this operation is valid then no need to check if user exists
