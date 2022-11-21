@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 public class FileWriter {
 public static Response<File> writeListToFile(String filePath, List<?> list)
 {
-    Response<File> response;
     Path path= Path.of(filePath);
     if(!Files.exists(path)) {
        try {

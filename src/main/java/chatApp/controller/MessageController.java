@@ -9,13 +9,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 
 @Controller
 public class MessageController {
-    private MessageService messageService;
+    private final  MessageService messageService;
      @Autowired
     public MessageController(MessageService messageService)
     {
@@ -30,11 +29,22 @@ public class MessageController {
     @GetMapping("MainRoom/Get")
     public ResponseEntity<List<Message>> getAllMainRoomMessages(@RequestParam(required = false) LocalDateTime start,@RequestParam(required = false) LocalDateTime end)
     {
-        List<Message> result=new ArrayList<>();
+        List<Message> result;
         if(start==null && end==null) result=messageService.loadPublicMessages();
         else if(end==null)result=messageService.loadPublicMessages(start);
         else result=messageService.loadPublicMessages(start, end);
         return  ResponseEntity.ok(result);
+    }
+    @GetMapping("channel/getSpecific")
+    public ResponseEntity<List<Message>> getChannel(int senderId,int reciverId)
+    {
+        return ResponseEntity.ok(messageService.getChannelMessages(senderId, reciverId));
+    }
+    @PostMapping("channel/send")
+    public ResponseEntity<String> sendPersonalMessage(int senderId,int reciverID,@RequestBody String message)
+    {
+        Message privateMessage = messageService.createPrivateMessage(senderId, reciverID, message);
+        return ResponseEntity.ok("The message was sent successfully.");
     }
 
 
