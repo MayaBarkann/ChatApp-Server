@@ -47,6 +47,7 @@ public class UserController {
     public ResponseEntity<String> activateUser(@PathVariable("activationToken") String activationToken) {
         Response response = emailActivationService.activateUser(activationToken);
         if (response.isSucceed()) {
+            //TODO: add user id to profile table
             return ResponseEntity.ok("Account with email " + response.getData().toString() + " was activated successfully.");
         }
         return ResponseEntity.badRequest().body(response.getMessage());
