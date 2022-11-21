@@ -24,7 +24,7 @@ public class MessageController {
     @PostMapping("MainRoom/Send")
     public ResponseEntity<String> sendPublicMessage(@RequestBody String message,@RequestHeader(HttpHeaders.FROM) int senderId)
     {
-        Message publicMessage = messageService.createPublicMessage(senderId, message);
+        messageService.createPublicMessage(senderId,message);
         return ResponseEntity.ok("The message was sent successfully.");
     }
     @GetMapping("MainRoom/Get")
@@ -44,11 +44,6 @@ public class MessageController {
     {
         Message privateMessage = messageService.createPrivateMessage(senderId, reciverID, message);
         return ResponseEntity.ok("The message was sent successfully.");
-    }
-    @GetMapping("getAllUserChannels")
-    public ResponseEntity<List<Message>> getAllUserChannels(@RequestParam int userId)
-    {
-        return ResponseEntity.ok(messageService.getAllUserChannels(userId));
     }
 
 
