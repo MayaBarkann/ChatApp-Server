@@ -39,12 +39,13 @@ public class UserProfileController {
         return userProfileService.editUserProfile(userProfile, localImagePath);
     }
 
-    @GetMapping("/loadProfile")
+    @GetMapping("/load")
     public Response<UserProfileToPresent> getUserProfileById(@RequestParam("id") int userId){
 
-        //todo: validate with permissiom that this operation is valid then no need to check if user exists
-        if (!userService.userExistsById(userId)){
-            return Response.createFailureResponse("user does not exists");
+        Response<Boolean> response = permissionService.checkPermission(userId, UserActions.HasProfile);
+        if (!response.isSucceed()){
+            return Response.createFailureResponse("can not update user profile, this user does not have permissions for editing profile");
+
         } else {
             Response<UserProfile> responseProfile = userProfileService.getUserProfileById(userId);
             Response<User> responseUser = userService.findUserById(userId);
