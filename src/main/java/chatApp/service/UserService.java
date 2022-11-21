@@ -54,4 +54,8 @@ public class UserService {
         return Response.createFailureResponse("User with id: " + id + "not found");
     }
 
+    public boolean userExistsById(int id){
+        return userRepository.findById(id).isPresent();
+    }
+
 }

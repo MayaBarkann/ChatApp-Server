@@ -17,7 +17,7 @@ public class UserProfile {
     private boolean isPublic;
     private String imageUrl;
 
-    //public UserProfile() { }
+    public UserProfile() { }
 
     public UserProfile(int id) {
         this.id = id;

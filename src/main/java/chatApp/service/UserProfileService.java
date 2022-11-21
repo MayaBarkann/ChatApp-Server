@@ -26,7 +26,7 @@ public class UserProfileService {
 
     private final Storage storage;
     private final UserProfileRepository userProfileRepository;
-    private final String URL_TEMPLATE = "https://storage.cloud.google.com/chatapp-ec932.appspot.com/%s";
+    private static final String URL_TEMPLATE = "https://storage.cloud.google.com/chatapp-ec932.appspot.com/%s";
 
     @Autowired
     public UserProfileService(UserProfileRepository userProfileRepository, Storage storage){
@@ -34,7 +34,39 @@ public class UserProfileService {
         this.storage = storage;
     }
 
-//    public Response<UserProfile> upload(String filePath, int id){
+    public Response<UserProfile> getUserProfileById(int id){
+    }
+
+    public Response<UserProfile> editUserProfile(UserProfile userProfile, String localImagePath){
+        if (localImagePath != null){ //TODO: CHECK ABOUT NULL OR ""
+            if (!localImagePath.isEmpty() && !uploadImage(userProfile, localImagePath)){
+                return Response.createFailureResponse("user profile edition failed- could not upload image to profile");
+            }
+        }
+        userProfileRepository.save(userProfile);
+        return Response.createSuccessfulResponse(userProfile);
+    }
+
+    private boolean uploadImage(UserProfile userProfile, String localPath){
+        int id = userProfile.getId();
+        BlobId blobId = BlobId.of("chatapp-ec932.appspot.com",Integer.toString(id));
+        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
+        File fileToRead = new File(localPath);
+        try{
+            byte[] data = Files.readAllBytes(Paths.get(fileToRead.toURI()));
+            storage.create(blobInfo,data);
+            String profilePhotoUrl = String.format(URL_TEMPLATE,id);
+            userProfile.setImageUrl(profilePhotoUrl);
+
+            return true;
+
+        } catch (IOException e){
+
+            return false;
+        }
+    }
+
+    //    public Response<UserProfile> upload(String filePath, int id){
 //        BlobId blobId = BlobId.of("chatapp-ec932.appspot.com",Integer.toString(id));
 //        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
 //        File fileToRead = new File(filePath);
@@ -54,29 +86,6 @@ public class UserProfileService {
 //            return Response.createFailureResponse("could not upload file to cloud, invalid path " + e.getMessage());
 //        }
 //    }
-
-    public Response<UserProfile> edit(UserProfile userProfile, String localImagePath){
-        
-    }
-
-    private Response<UserProfile> uploadImage(UserProfile userProfile, String localPath){
-        int id = userProfile.getId();
-        BlobId blobId = BlobId.of("chatapp-ec932.appspot.com",Integer.toString(id));
-        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
-        File fileToRead = new File(localPath);
-        try{
-            byte[] data = Files.readAllBytes(Paths.get(fileToRead.toURI()));
-            storage.create(blobInfo,data);
-            String profilePhotoUrl = String.format(URL_TEMPLATE,id);
-            userProfile.setImageUrl(profilePhotoUrl);
-
-            return Response.createSuccessfulResponse(userProfile);
-
-        } catch (IOException e){
-
-            return Response.createFailureResponse("could not upload file to cloud, invalid path " + e.getMessage());
-        }
-    }
 
 
 
