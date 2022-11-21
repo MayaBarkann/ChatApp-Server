@@ -82,7 +82,7 @@ public class EmailSender {
      * @param destination Email address that needs to receive the email.
      * @return Response object, contains: if action successful - data=destination email, isSucceed=true, message=null; if action failed - data=null, isSucceed=false, message=reason for failure.
      */
-    public Response sendMail(String subject, String msg, String destination) {
+    public Response<String> sendMail(String subject, String msg, String destination) {
         // Encode as MIME message
         Properties props = new Properties();
         Session session = Session.getDefaultInstance(props, null);
