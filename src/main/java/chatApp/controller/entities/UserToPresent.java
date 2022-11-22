@@ -3,6 +3,7 @@ package chatApp.controller.entities;
 import chatApp.Entities.User;
 import chatApp.Entities.UserType;
 
+
 public class UserToPresent {
     private final String username;
     private final String email;
