@@ -4,5 +4,5 @@ public enum UserType {
     ADMIN,
     GUEST,
     REGISTERED,
-    NOT_ACTIVATED
+    NOT_ACTIVATED,
 }
