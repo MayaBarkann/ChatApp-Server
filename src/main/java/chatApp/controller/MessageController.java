@@ -5,9 +5,12 @@ import chatApp.Entities.Response;
 import chatApp.Entities.UserActions;
 import chatApp.service.MessageService;
 import chatApp.service.PermissionService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 
-@Controller
+@RestController
 public class MessageController {
     private final  MessageService messageService;
     private final PermissionService permissionService;
@@ -40,7 +43,8 @@ public class MessageController {
         }
         return ResponseEntity.badRequest().body("user not found.");
     }
-    @GetMapping("MainRoom/Get")
+    @MessageMapping("/app")
+    @SendTo("/MainRoom/Get")
     public ResponseEntity<List<Message>> getAllMainRoomMessages(@RequestParam int userID,@RequestParam(required = false) LocalDateTime start,@RequestParam(required = false) LocalDateTime end)
     {
         Response<Boolean> response = permissionService.checkPermission(userID, UserActions.ReceiveMainRoomMessage);
