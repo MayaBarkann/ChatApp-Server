@@ -8,6 +8,7 @@ import chatApp.service.PermissionService;
 import chatApp.service.UserProfileService;
 import chatApp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import chatApp.Entities.User;
 
@@ -31,43 +32,56 @@ public class UserProfileController {
      * @return response containing the new user profile
      */
     @PostMapping("/edit")
-    public Response<UserProfile> editUserProfile(@RequestBody UserProfile userProfile, @RequestParam("path") String localImagePath){
+    public ResponseEntity<String> editUserProfile(@RequestBody UserProfile userProfile, @RequestParam("path") String localImagePath){
         if(userProfile == null){
-            return Response.createFailureResponse("Can not update user profile - user does not exists");
+            return ResponseEntity.badRequest().body("user not found.");
         }
         Response<Boolean> response = permissionService.checkPermission(userProfile.getId(), UserActions.HasProfile);
         if (!response.isSucceed()){
-            return Response.createFailureResponse("Can not update user profile - this user does not have permissions for editing profile");
+            return ResponseEntity.badRequest().body("user not found.");
+
+        } else if(!response.getData()){
+            return ResponseEntity.status(401).body("this type of user does not have permissions to edit profile.");
+
         }
-        return userProfileService.editUserProfile(userProfile, localImagePath);
+
+        Response<UserProfile> responseEdit = userProfileService.editUserProfile(userProfile, localImagePath);
+
+        if(!responseEdit.isSucceed()){
+            return ResponseEntity.status(401).body(responseEdit.getMessage());
+        }
+
+        return ResponseEntity.ok("profile was edit successfully");
     }
 
     /***
-     * load user profile by user id. The method checks if the user exists and has profile by calling to permission manager.
-     * @param userId
+     * load user profile by user id. The method checks if the requesting user exists and has permissions to view profile
+     * and checks if the profile we want to view exists and public by calling to permission manager.
+     * @param userId - the user id of the user requesting to view profile
+     * @param userIdToView - the id of the profile we want to view
      * @return response with the user profile if it has the permissions for it, if not return failure response with the right message
      */
     @GetMapping("/load")
-    public Response<UserProfileToPresent> getUserProfileById(@RequestParam("id") int userId){
+    public ResponseEntity<UserProfileToPresent> getUserProfileById(@RequestParam("id") int userId, @RequestParam("id_of_user_profile_to_view") int userIdToView){
+        Response<Boolean> responseRequestUserHasPermissionsToViewProfile = permissionService.checkPermission(userId, UserActions.ViewProfile);
+        Response<Boolean> responseUserToViewHasProfile = permissionService.checkPermission(userId, UserActions.HasProfile);
 
-        Response<Boolean> response = permissionService.checkPermission(userId, UserActions.HasProfile);
-        if (!response.isSucceed()){
-            return Response.createFailureResponse("Could not load user profile - this user does not have the permissions for it");
+        if(responseRequestUserHasPermissionsToViewProfile.isSucceed() && responseUserToViewHasProfile.isSucceed()){
 
-        } else {
-            Response<UserProfile> responseProfile = userProfileService.getUserProfileById(userId);
-            Response<User> responseUser = userService.findUserById(userId);
+            if(responseRequestUserHasPermissionsToViewProfile.getData() && responseUserToViewHasProfile.getData()){
+                Response<UserProfile> responseViewProfile = userProfileService.getUserProfileById(userIdToView);
+                Response<User> responseViewUser = userService.findUserById(userIdToView);
 
-            if(!responseProfile.isSucceed() || !responseUser.isSucceed()){
-                return Response.createFailureResponse("could not load user profile");
+                if(responseViewProfile.getData().isPublic() || userId == userIdToView){
+
+                    return ResponseEntity.ok(UserProfileToPresent.createFromUserProfileAndUser(responseViewProfile.getData(),
+                            responseViewUser.getData()));
+                }
             }
 
-            return Response.createSuccessfulResponse(UserProfileToPresent.createFromUserProfileAndUser(responseProfile.getData(),
-                    responseUser.getData()));
+            return ResponseEntity.status(401).body(null);
         }
 
+        return ResponseEntity.badRequest().body(null);
     }
-
-
-
 }
