@@ -16,7 +16,21 @@ public class User {
     private String password;
     @Enumerated(EnumType.STRING)
     private UserType userType;
+    @Enumerated(EnumType.STRING)
+    private MessageAbility messageAbility = MessageAbility.UNMUTE;
 
+    public User() {
+    }
+
+    public User(String username, String email, String password) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+    }
+
+    public void setMessageAbility(MessageAbility messageAbility) { this.messageAbility = messageAbility; }
+
+    public MessageAbility getMessageAbility() { return messageAbility; }
 
     public int getId() {
         return id;
