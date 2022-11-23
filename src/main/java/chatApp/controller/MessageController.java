@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-
+@CrossOrigin
 @RestController
 public class MessageController {
     private final  MessageService messageService;
@@ -49,8 +49,7 @@ public class MessageController {
         }
         return ResponseEntity.badRequest().body("user not found.");
     }
-    @MessageMapping("/app")
-    @SendTo("/MainRoom/Get")
+    @GetMapping("MainRoom/Get")
     public ResponseEntity<List<Message>> getAllMainRoomMessages(@RequestParam int userID,@RequestParam(required = false) LocalDateTime start,@RequestParam(required = false) LocalDateTime end)
     {
         Response<Boolean> response = permissionService.checkPermission(userID, UserActions.ReceiveMainRoomMessage);

@@ -4,20 +4,30 @@ import com.google.gson.Gson;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.springframework.messaging.converter.MappingJackson2MessageConverter;
+import org.springframework.messaging.simp.stomp.StompSessionHandler;
+import org.springframework.web.socket.client.standard.StandardWebSocketClient;
+import org.springframework.web.socket.messaging.WebSocketStompClient;
 
-
-
+import java.util.Scanner;
 
 
 public class MainRoomTest {
     private static int Port = 8080;
-    private static String URL = "http://localhost" + Port;
+    private static String URL = "ws://localhost:" + Port;
     private static String MainRoomURL = URL + "/topic/mainChat";
-    private static Gson gson= new Gson();
-    private static WebSocketClient webSocketClient;
+    private static StandardWebSocketClient client;
     @BeforeAll
     public static void beforeAll() {
-        webSocketClient = WebSocketClient.start(MainRoomURL);
+       client  = new StandardWebSocketClient();
+
+        WebSocketStompClient stompClient = new WebSocketStompClient(client);
+        stompClient.setMessageConverter(new MappingJackson2MessageConverter());
+
+        StompSessionHandler sessionHandler = new MyStompSessionHandler();
+        stompClient.connect(URL, sessionHandler);
+
+        new Scanner(System.in).nextLine();
     }
     @Test
     public void testMainRoomSendMessage() {
