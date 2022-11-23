@@ -1,11 +1,10 @@
 package chatApp.service;
 
-import chatApp.Entities.MessageAbility;
-import chatApp.Entities.Response;
-import chatApp.Entities.User;
-import chatApp.Entities.UserType;
+import chatApp.Entities.*;
 import chatApp.repository.UserRepository;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -57,7 +56,9 @@ public class UserService {
         }
         newUser.setPassword(ServiceUtil.encryptPassword(newUser.getPassword()));
         newUser.setUserType(UserType.NOT_ACTIVATED);
+        newUser.setUserStatus(UserStatus.OFFLINE);
         newUser.setMessageAbility(MessageAbility.UNMUTED);
+        newUser.setRegisterDateTime(LocalDateTime.now());
         userRepository.save(newUser);
         return Response.createSuccessfulResponse(newUser);
     }

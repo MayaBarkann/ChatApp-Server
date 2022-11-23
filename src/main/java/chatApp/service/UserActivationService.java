@@ -85,7 +85,8 @@ public class UserActivationService {
             return response;
         }
         if (LocalDateTime.parse(decodedParts.get("date")).isBefore(LocalDateTime.now())) {
-            return Response.createFailureResponse(String.format("Activation token expired"));
+            userRepository.deleteByEmail(decodedParts.get("email"));
+            return Response.createFailureResponse(String.format("Activation token expired. Please register again."));
         }
         return Response.createSuccessfulResponse(activationToken);
     }
