@@ -31,7 +31,7 @@ public class UserProfileController {
      * @param localImagePath path to the image in case we want to update the image, if not then pass empty string.
      * @return response containing the new user profile
      */
-    @PostMapping("/edit")
+    @PutMapping("/edit")
     public ResponseEntity<String> editUserProfile(@RequestBody UserProfile userProfile, @RequestParam("path") String localImagePath){
         if(userProfile == null){
             return ResponseEntity.badRequest().body("user not found.");

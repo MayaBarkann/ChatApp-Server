@@ -5,10 +5,8 @@ public enum UserActions {
     SendMainRoomMessage,
     ReceivePersonalMessage,
     ReceiveMainRoomMessage,
-    MuteOthers,
-    UnmuteOthers,
+    MuteOrUnmuteOthers,
     HasProfile,
     ViewProfile,
-    Mute,
-    Unmute
+
 }
