@@ -1,6 +1,7 @@
 package chatApp.Entities;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
@@ -16,7 +17,38 @@ public class User {
     private String password;
     @Enumerated(EnumType.STRING)
     private UserType userType;
+    @Enumerated(EnumType.STRING)
+    private MessageAbility messageAbility = MessageAbility.UNMUTED;
+    @Enumerated(EnumType.STRING)
+    private UserStatus userStatus;
+    private LocalDateTime registerDateTime;
+    private LocalDateTime lastLoginDateTime;
 
+
+    public User() {
+    }
+
+    public User(String username, String email, String password) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+    }
+
+    public void setUserStatus(UserStatus userStatus) {
+        this.userStatus = userStatus;
+    }
+
+    public UserStatus getUserStatus() {
+        return userStatus;
+    }
+
+    public void setMessageAbility(MessageAbility messageAbility) {
+        this.messageAbility = messageAbility;
+    }
+
+    public MessageAbility getMessageAbility() {
+        return messageAbility;
+    }
 
     public int getId() {
         return id;
@@ -44,6 +76,22 @@ public class User {
 
     public void setUserType(UserType userType) {
         this.userType = userType;
+    }
+
+    public LocalDateTime getRegisterDateTime() {
+        return registerDateTime;
+    }
+
+    public LocalDateTime getLastLoginDateTime() {
+        return lastLoginDateTime;
+    }
+
+    public void setRegisterDateTime(LocalDateTime registerDateTime) {
+        this.registerDateTime = registerDateTime;
+    }
+
+    public void setLastLoginDateTime(LocalDateTime lastLoginDateTime) {
+        this.lastLoginDateTime = lastLoginDateTime;
     }
 
     @Override
@@ -76,5 +124,13 @@ public class User {
                 ", email='" + email + '\'' +
                 ", userType=" + userType +
                 '}';
+    }
+
+    public void toggleMessageAbility() {
+        if (this.messageAbility == MessageAbility.MUTED) {
+            this.messageAbility = MessageAbility.UNMUTED;
+        } else {
+            this.messageAbility = MessageAbility.MUTED;
+        }
     }
 }

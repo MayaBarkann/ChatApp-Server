@@ -1,10 +1,10 @@
 package chatApp.service;
 
-import chatApp.Entities.Response;
-import chatApp.Entities.User;
-import chatApp.Entities.UserType;
+import chatApp.Entities.*;
 import chatApp.repository.UserRepository;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -43,18 +43,24 @@ public class UserService {
     /**
      * Adds a user to the database if it has a unique email and unique username.
      *
-     * @param user - the user's data
+     * @param email - user email inputted during registration.
+     * @param password - user password inputted during registration.
+     * @param username - user username inputted during registration.
      * @return a Response, contains: if action succeeded - data=saved user, isSucceeded=true, message=null; if action failed - data = null. isSucceeded = false, message=reason for failure
      */
-    public Response<User> addUser(User user) {
-        Response<User> response = validateUserInput(user);
+    public Response<User> addUser(String email,String password,String username) {
+        User newUser = new User(username,email,password);
+        Response<User> response = validateUserInput(newUser);
         if(!response.isSucceed()){
             return Response.createFailureResponse(response.getMessage());
         }
-        user.setPassword(ServiceUtil.encryptPassword(user.getPassword()));
-        user.setUserType(UserType.NOT_ACTIVATED);
-        userRepository.save(user);
-        return Response.createSuccessfulResponse(user);
+        newUser.setPassword(ServiceUtil.encryptPassword(newUser.getPassword()));
+        newUser.setUserType(UserType.NOT_ACTIVATED);
+        newUser.setUserStatus(UserStatus.OFFLINE);
+        newUser.setMessageAbility(MessageAbility.UNMUTED);
+        newUser.setRegisterDateTime(LocalDateTime.now());
+        userRepository.save(newUser);
+        return Response.createSuccessfulResponse(newUser);
     }
 
     /**
@@ -71,8 +77,32 @@ public class UserService {
         return Response.createFailureResponse("User with id: " + id + "not found");
     }
 
-    public boolean userExistsById(int id){
-        return userRepository.findById(id).isPresent();
+    private User getUserById(int id){
+        return userRepository.findById(id).orElse(null);
+    }
+
+    private boolean updateUser(User user){
+        if(user != null && getUserById(user.getId()) != null){
+            userRepository.save(user);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * toggles the message ability (mute or unmute)
+     * @param id - id of user we want to toggle
+     * @return Successful response if the user exists and toggling operation succeeded,
+     * returns failure response if the user does not exists.
+     */
+    public Response<User> toggleMessageAbility(int id){
+        User user = getUserById(id);
+        user.toggleMessageAbility();
+        if(updateUser(user)){
+            return Response.createSuccessfulResponse(user);
+        }
+        return Response.createFailureResponse("user does not exists");
+
     }
 
 }
