@@ -3,11 +3,16 @@ package chatApp.controller;
 import chatApp.Entities.Message;
 import chatApp.Entities.Response;
 import chatApp.Entities.UserActions;
+import chatApp.controller.entities.OutputMessage;
 import chatApp.service.MessageService;
 import chatApp.service.PermissionService;
+
+import chatApp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,14 +21,16 @@ import java.util.List;
 import java.util.Optional;
 
 
-@Controller
+@RestController
 public class MessageController {
     private final  MessageService messageService;
     private final PermissionService permissionService;
+    private final UserService userService;
      @Autowired
-    public MessageController(MessageService messageService,PermissionService permissionService) {
+    public MessageController(MessageService messageService,PermissionService permissionService,UserService userService) {
         this.messageService = messageService;
         this.permissionService=permissionService;
+        this.userService=userService;
     }
 
     @PostMapping("MainRoom/Send")
@@ -33,14 +40,17 @@ public class MessageController {
         if(response.isSucceed())
         {
             if(response.getData()) {
-                messageService.createPublicMessage(senderId, message);
+                Message publicMessage = messageService.createPublicMessage(senderId, message);
+                String username = userService.findUserById(senderId).getData().getUsername();
+                ChatUtil.writeMessageToMainRoom(OutputMessage.createPublicMessage(publicMessage,username));
                 return ResponseEntity.ok("The message was sent successfully.");
             }
             return ResponseEntity.status(401).body("You don't have permission to send a message to the main room.");
         }
         return ResponseEntity.badRequest().body("user not found.");
     }
-    @GetMapping("MainRoom/Get")
+    @MessageMapping("/app")
+    @SendTo("/MainRoom/Get")
     public ResponseEntity<List<Message>> getAllMainRoomMessages(@RequestParam int userID,@RequestParam(required = false) LocalDateTime start,@RequestParam(required = false) LocalDateTime end)
     {
         Response<Boolean> response = permissionService.checkPermission(userID, UserActions.ReceiveMainRoomMessage);
@@ -61,7 +71,10 @@ public class MessageController {
         if(response.isSucceed() && response2.isSucceed())
         {
             if(response.getData() && response2.getData()) {
-                messageService.createPrivateMessage(senderId, reciverID, message);
+                String senderName = userService.findUserById(senderId).getData().getUsername();
+                String reciverName = userService.findUserById(reciverID).getData().getUsername();
+                Message privateMessage = messageService.createPrivateMessage(senderId, reciverID, message);
+                ChatUtil.writeMessageToPrivateChannel(OutputMessage.createPrivateMessage(privateMessage,senderName,reciverName));
                 return ResponseEntity.ok("The message was sent successfully.");
             }
            if(response.getData()) return ResponseEntity.status(401).body("You don't have permission to send a personal message.");
