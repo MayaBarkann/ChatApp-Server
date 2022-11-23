@@ -16,7 +16,19 @@ public class User {
     private String password;
     @Enumerated(EnumType.STRING)
     private UserType userType;
+    @Enumerated(EnumType.STRING)
+    private MessageAbility messageAbility = MessageAbility.UNMUTED;
+    @Enumerated(EnumType.STRING)
+    private UserStatus userStatus;
 
+
+    public void setUserStatus(UserStatus userStatus) { this.userStatus = userStatus; }
+
+    public UserStatus getUserStatus() { return userStatus; }
+
+    public void setMessageAbility(MessageAbility messageAbility) { this.messageAbility = messageAbility; }
+
+    public MessageAbility getMessageAbility() { return messageAbility; }
 
     public int getId() {
         return id;
@@ -76,5 +88,13 @@ public class User {
                 ", email='" + email + '\'' +
                 ", userType=" + userType +
                 '}';
+    }
+
+    public void toggleMessageAbility(){
+        if(this.messageAbility == MessageAbility.MUTED){
+            this.messageAbility = MessageAbility.UNMUTED;
+        } else {
+            this.messageAbility = MessageAbility.MUTED;
+        }
     }
 }

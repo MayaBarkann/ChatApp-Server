@@ -2,7 +2,9 @@ package chatApp.controller;
 
 import chatApp.Entities.Response;
 import chatApp.Entities.User;
+import chatApp.Entities.UserActions;
 import chatApp.controller.entities.UserToPresent;
+import chatApp.service.PermissionService;
 import chatApp.service.UserActivationService;
 import chatApp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,8 @@ public class UserController {
     private UserService userService;
     @Autowired
     private UserActivationService userActivationService;
+    @Autowired
+    private PermissionService permissionService;
 
     /**
      * Activates the addUser() method of UserService, if successful activates sendActivationEmail() method of UserActivationService.
@@ -66,6 +70,33 @@ public class UserController {
             return ResponseEntity.badRequest().body("Problem resending activation email to address: " + email + ". " + responseResendEmail.getMessage());
         }
         return ResponseEntity.ok("Activation email resent successfully to: " + email);
+    }
+
+    /**
+     * Toggles the message ability if the users have the right permissions to do it.
+     * @param userIdPerformsTheToggle - id of user who wants to toggle another user
+     * @param userIdToToggle - id of the user we performs the toggle on
+     * @return Successful response if the toggle succeeded otherwise- failure response with the reason
+     */
+
+    @PutMapping("/toggle-mute-unmute")
+    public ResponseEntity<String> toggleMuteUnmute(@RequestParam("userIdPerformsTheToggle") int userIdPerformsTheToggle, @RequestParam("userIdToToggle") int userIdToToggle){
+        Response<Boolean> responseHasPermissionsToToggle = permissionService.checkPermission(userIdPerformsTheToggle,UserActions.MuteOrUnmuteOthers);
+        Response<Boolean> responseUserExistsAndCanBeToggledByOthers = permissionService.checkPermission(userIdToToggle,UserActions.MuteOrUnmuteOthers);
+
+        if(responseHasPermissionsToToggle.isSucceed() && responseUserExistsAndCanBeToggledByOthers.isSucceed()){
+
+            if(responseHasPermissionsToToggle.getData() && !responseUserExistsAndCanBeToggledByOthers.getData()){
+                Response<User> responsOfToggleUser = userService.toggleMessageAbility(userIdToToggle);
+                if(responsOfToggleUser.isSucceed()){
+                    return ResponseEntity.ok("user ability to send messages has changed successfully");
+                }
+            }
+
+            return ResponseEntity.status(401).body("can not perform action- user does not have the right permissions to do it");
+        }
+
+        return ResponseEntity.badRequest().body(responseHasPermissionsToToggle.getMessage() + " " + responseUserExistsAndCanBeToggledByOthers.getMessage());
     }
 
 }

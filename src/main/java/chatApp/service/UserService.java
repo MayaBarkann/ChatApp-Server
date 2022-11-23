@@ -71,8 +71,32 @@ public class UserService {
         return Response.createFailureResponse("User with id: " + id + "not found");
     }
 
-    public boolean userExistsById(int id){
-        return userRepository.findById(id).isPresent();
+    private User getUserById(int id){
+        return userRepository.findById(id).orElse(null);
+    }
+
+    private boolean updateUser(User user){
+        if(user != null && getUserById(user.getId()) != null){
+            userRepository.save(user);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * toggles the message ability (mute or unmute)
+     * @param id - id of user we want to toggle
+     * @return Successful response if the user exists and toggling operation succeeded,
+     * returns failure response if the user does not exists.
+     */
+    public Response<User> toggleMessageAbility(int id){
+        User user = getUserById(id);
+        user.toggleMessageAbility();
+        if(updateUser(user)){
+            return Response.createSuccessfulResponse(user);
+        }
+        return Response.createFailureResponse("user does not exists");
+
     }
 
 }
