@@ -2,6 +2,7 @@ package chatApp.controller;
 
 import chatApp.Entities.Response;
 import chatApp.Entities.User;
+import chatApp.controller.entities.UserRegister;
 import chatApp.Entities.UserActions;
 import chatApp.controller.entities.UserToPresent;
 import chatApp.service.PermissionService;
@@ -26,20 +27,28 @@ public class UserController {
     /**
      * Activates the addUser() method of UserService, if successful activates sendActivationEmail() method of UserActivationService.
      *
-     * @param user
+     * @param userRegister details of user inputted during registration and sent with the request.
      * @return ResponseEntity<String>, will hold: if action succeeded - saved user data; if action failed:reason for failure
      */
     @RequestMapping(method = RequestMethod.POST, value = "/register")
-    public ResponseEntity<String> createUser(@RequestBody User user) {
-        Response<User> responseUser = userService.addUser(user);
-        if (responseUser.isSucceed()) {
-            Response<String> responseEmail = userActivationService.sendActivationEmail(user.getEmail());
+    public ResponseEntity<String> createUser(@RequestBody UserRegister userRegister) {
+        Response<String> isValidResponse = ControllerUtil.validateUserCredentials(userRegister.getEmail(),userRegister.getPassword());
+        if(!isValidResponse.isSucceed()){
+            return ResponseEntity.badRequest().body("Error during user register. Reason: " + isValidResponse.getMessage());
+        }
+        isValidResponse = ControllerUtil.isUsernameValid(userRegister.getUsername());
+        if(!isValidResponse.isSucceed()){
+            return ResponseEntity.badRequest().body("Error during user register. Reason: " + isValidResponse.getMessage());
+        }
+        Response<User> responseAddUser = userService.addUser(userRegister.getEmail(),userRegister.getPassword(),userRegister.getUsername());
+        if (responseAddUser.isSucceed()) {
+            Response<String> responseEmail = userActivationService.sendActivationEmail(userRegister.getEmail());
             if (!responseEmail.isSucceed()) {
                 return ResponseEntity.badRequest().body("Problem sending activation email to address: " + responseEmail.getMessage());
             }
-            return ResponseEntity.ok("User added successfully: " + UserToPresent.createFromUser(user).toString() + "\nActivation email was sent to: " + user.getEmail());
+            return ResponseEntity.ok("User added successfully: " + UserToPresent.createFromUser(responseAddUser.getData()).toString() + "\nActivation email was sent to: " + userRegister.getEmail());
         }
-        return ResponseEntity.badRequest().body(responseUser.getMessage());
+        return ResponseEntity.badRequest().body(responseAddUser.getMessage());
     }
 
     /**
@@ -65,9 +74,13 @@ public class UserController {
      */
     @RequestMapping(method = RequestMethod.POST, value = "/resendActivationEmail")
     public ResponseEntity<String> resendActivationEmail(@RequestBody String email) {
+        Response<String> validateEmailResponse = ControllerUtil.isEmailValid(email);
+        if(!validateEmailResponse.isSucceed()){
+            return ResponseEntity.badRequest().body("Error during resending activation email to address: " + email + ". Reason: " + validateEmailResponse.getMessage());
+        }
         Response<String> responseResendEmail = userActivationService.sendActivationEmail(email);
         if (!responseResendEmail.isSucceed()) {
-            return ResponseEntity.badRequest().body("Problem resending activation email to address: " + email + ". " + responseResendEmail.getMessage());
+            return ResponseEntity.badRequest().body("Error during resending activation email to address: " + email + ". " + responseResendEmail.getMessage());
         }
         return ResponseEntity.ok("Activation email resent successfully to: " + email);
     }
