@@ -47,16 +47,19 @@ public class UserProfileService {
      */
 
     public Response<UserProfile> editUserProfile(UserProfile userProfile, String localImagePath){
-        if (localImagePath != null){
-            if (!localImagePath.isEmpty() && !uploadImage(userProfile, localImagePath).isSucceed()){
+        if(userProfileRepository.findById(userProfile.getId()) != null){
+            if (localImagePath != null){
+                if (!localImagePath.isEmpty() && !uploadImage(userProfile, localImagePath).isSucceed()){
 
-                return Response.createFailureResponse("user profile edition failed- could not upload image to profile");
+                    return Response.createFailureResponse("user profile edition failed- could not upload image to profile");
+                }
             }
+            userProfileRepository.save(userProfile);
+
+            return Response.createSuccessfulResponse(userProfile);
         }
 
-        userProfileRepository.save(userProfile);
-
-        return Response.createSuccessfulResponse(userProfile);
+        return Response.createFailureResponse("user profile not exists");
     }
 
     private Response<UserProfile> uploadImage(UserProfile userProfile, String localPath){
