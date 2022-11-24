@@ -81,12 +81,8 @@ public class UserService {
         return userRepository.findById(id).orElse(null);
     }
 
-    private boolean updateUser(User user){
-        if(user != null && getUserById(user.getId()) != null){
-            userRepository.save(user);
-            return true;
-        }
-        return false;
+    private void updateUser(User user){
+        userRepository.save(user);
     }
 
     /**
@@ -97,11 +93,35 @@ public class UserService {
      */
     public Response<User> toggleMessageAbility(int id){
         User user = getUserById(id);
-        user.toggleMessageAbility();
-        if(updateUser(user)){
-            return Response.createSuccessfulResponse(user);
+
+        if(user == null){
+            return Response.createFailureResponse("user does not exists");
         }
-        return Response.createFailureResponse("user does not exists");
+        user.toggleMessageAbility();
+        updateUser(user);
+
+        return Response.createSuccessfulResponse(user);
+    }
+
+
+    public Response<User> changeStatus(int id){
+        User user = getUserById(id);
+
+        if(user == null){
+            return Response.createFailureResponse("user does not exists");
+        }
+
+        if(user.getUserStatus() == UserStatus.ONLINE){
+            user.setUserStatus(UserStatus.AWAY);
+        } else if(user.getUserStatus() == UserStatus.AWAY){
+            user.setUserStatus(UserStatus.ONLINE);
+        } else {
+            return Response.createFailureResponse("can not change status to user");
+        }
+
+        updateUser(user);
+        return Response.createSuccessfulResponse(user);
+
 
     }
 

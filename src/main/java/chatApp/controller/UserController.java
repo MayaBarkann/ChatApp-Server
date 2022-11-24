@@ -2,6 +2,7 @@ package chatApp.controller;
 
 import chatApp.Entities.Response;
 import chatApp.Entities.User;
+import chatApp.Entities.UserStatus;
 import chatApp.controller.entities.UserRegister;
 import chatApp.Entities.UserActions;
 import chatApp.controller.entities.UserToPresent;
@@ -111,5 +112,34 @@ public class UserController {
 
         return ResponseEntity.badRequest().body(responseHasPermissionsToToggle.getMessage() + " " + responseUserExistsAndCanBeToggledByOthers.getMessage());
     }
+
+    /**
+     * method for changing the user status. If the user status is online - the method changes the status to away
+     * and the other way around
+     * @param userId
+     * @return response entity
+     */
+
+    @PutMapping("/change-status")
+    public ResponseEntity<String> changeStatus(@RequestParam("userId") int userId){
+        //todo: add a check (at filter layer) that checks that the user is connected
+        Response<Boolean> hasPermissionsToChangeStatus = permissionService.checkPermission(userId, UserActions.ChangeStatus);
+
+        if(hasPermissionsToChangeStatus.isSucceed()){
+            if(hasPermissionsToChangeStatus.getData()){
+                Response<User> changeStatus= userService.changeStatus(userId);
+                if(changeStatus.isSucceed()){
+                    return ResponseEntity.ok("user status changed successfully to- " + changeStatus.getData().getUserStatus());
+                }
+                return ResponseEntity.status(401).body(changeStatus.getMessage());
+            }
+
+            return ResponseEntity.status(401).body("can not change status, this user does not have permissions");
+
+        }
+
+        return ResponseEntity.badRequest().body("can not change user status - this user does not exist");
+    }
+
 
 }
