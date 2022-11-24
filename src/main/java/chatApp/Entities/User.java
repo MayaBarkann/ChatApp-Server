@@ -24,6 +24,8 @@ public class User {
     private LocalDateTime registerDateTime;
     private LocalDateTime lastLoginDateTime;
 
+    @Transient
+    private String authToken;
 
     public User() {
     }
@@ -86,12 +88,20 @@ public class User {
         return lastLoginDateTime;
     }
 
+    public void setLastLoginDateTime(LocalDateTime lastLoginDateTime) {
+        this.lastLoginDateTime = lastLoginDateTime;
+    }
+
     public void setRegisterDateTime(LocalDateTime registerDateTime) {
         this.registerDateTime = registerDateTime;
     }
 
-    public void setLastLoginDateTime(LocalDateTime lastLoginDateTime) {
-        this.lastLoginDateTime = lastLoginDateTime;
+    public String getAuthToken() {
+        return authToken;
+    }
+
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
     }
 
     @Override
