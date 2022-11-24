@@ -24,14 +24,14 @@ public class User {
     private LocalDateTime registerDateTime;
     private LocalDateTime lastLoginDateTime;
 
-
-    public User() {
-    }
-
     public User(String username, String email, String password) {
         this.username = username;
         this.email = email;
         this.password = password;
+    }
+
+    public User(){
+
     }
 
     public void setUserStatus(UserStatus userStatus) {
@@ -86,13 +86,14 @@ public class User {
         return lastLoginDateTime;
     }
 
+    public void setLastLoginDateTime(LocalDateTime lastLoginDateTime) {
+        this.lastLoginDateTime = lastLoginDateTime;
+    }
+
     public void setRegisterDateTime(LocalDateTime registerDateTime) {
         this.registerDateTime = registerDateTime;
     }
 
-    public void setLastLoginDateTime(LocalDateTime lastLoginDateTime) {
-        this.lastLoginDateTime = lastLoginDateTime;
-    }
 
     @Override
     public boolean equals(Object o) {
