@@ -24,16 +24,14 @@ public class User {
     private LocalDateTime registerDateTime;
     private LocalDateTime lastLoginDateTime;
 
-    @Transient
-    private String authToken;
-
-    public User() {
-    }
-
     public User(String username, String email, String password) {
         this.username = username;
         this.email = email;
         this.password = password;
+    }
+
+    public User(){
+
     }
 
     public void setUserStatus(UserStatus userStatus) {
@@ -96,13 +94,6 @@ public class User {
         this.registerDateTime = registerDateTime;
     }
 
-    public String getAuthToken() {
-        return authToken;
-    }
-
-    public void setAuthToken(String authToken) {
-        this.authToken = authToken;
-    }
 
     @Override
     public boolean equals(Object o) {
