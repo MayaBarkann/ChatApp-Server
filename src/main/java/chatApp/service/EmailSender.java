@@ -93,7 +93,7 @@ public class EmailSender {
             email.setSubject(subject);
             email.setText(msg);
         } catch (MessagingException e) {
-            return Response.createFailureResponse("Failed to create email message.");
+            return Response.createFailureResponse("Failed to create email message." + e);
         }
 
         // Encode and wrap the MIME message into a gmail message
@@ -101,7 +101,7 @@ public class EmailSender {
         try {
             email.writeTo(buffer);
         } catch (IOException | MessagingException e) {
-            return Response.createFailureResponse("Failed to write message to ByteArrayOutputStream.");
+            return Response.createFailureResponse("Failed to write message to ByteArrayOutputStream." + e);
         }
         byte[] rawMessageBytes = buffer.toByteArray();
         String encodedEmail = Base64.encodeBase64URLSafeString(rawMessageBytes);
@@ -125,7 +125,7 @@ public class EmailSender {
                 }
             }
         } catch (IOException e) {
-            return Response.createFailureResponse("Unable to send email to " + destination);
+            return Response.createFailureResponse("Unable to send email to " + destination + e);
         }
         return Response.createSuccessfulResponse(destination);
     }
