@@ -1,7 +1,7 @@
-import chatApp.Entities.PermissionsManager;
-import chatApp.Entities.Response;
-import chatApp.Entities.UserActions;
-import chatApp.Entities.UserType;
+import chatApp.entities.PermissionsManager;
+import chatApp.entities.Response;
+import chatApp.entities.UserActions;
+import chatApp.entities.UserType;
 import chatApp.repository.UserRepository;
 import chatApp.service.PermissionService;
 import org.junit.jupiter.api.Assertions;
