@@ -23,7 +23,7 @@ public class PermissionTest {
     @Test
     public void testPermission() {
         boolean responseAdmin = PermissionsManager.hasPermission(UserType.ADMIN, UserActions.SendMainRoomMessage);
-        boolean responseRegister = PermissionsManager.hasPermission(UserType.REGISTERED, UserActions.MuteOthers);
+        boolean responseRegister = PermissionsManager.hasPermission(UserType.REGISTERED, UserActions.MuteOrUnmuteOthers);
         boolean responseGuest = PermissionsManager.hasPermission(UserType.GUEST, UserActions.ReceivePersonalMessage);
         boolean responseNotActivated = PermissionsManager.hasPermission(UserType.NOT_ACTIVATED, UserActions.SendMainRoomMessage);
         Assertions.assertTrue(responseAdmin, "admin should have permission");

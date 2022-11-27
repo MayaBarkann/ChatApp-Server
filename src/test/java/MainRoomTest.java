@@ -14,17 +14,17 @@ import java.util.Scanner;
 
 public class MainRoomTest {
     private static int Port = 8080;
-    private static String URL = "ws://localhost:" + Port;
+    private static String URL = "ws://localhost:" + Port+"/ws";
     private static String MainRoomURL = URL + "/topic/mainChat";
     private static StandardWebSocketClient client;
     @BeforeAll
     public static void beforeAll() {
-       client  = new StandardWebSocketClient();
-
+        StompSessionHandler sessionHandler = new MyStompSessionHandler();
+        client  = new StandardWebSocketClient();
         WebSocketStompClient stompClient = new WebSocketStompClient(client);
         stompClient.setMessageConverter(new MappingJackson2MessageConverter());
 
-        StompSessionHandler sessionHandler = new MyStompSessionHandler();
+
         stompClient.connect(URL, sessionHandler);
 
         new Scanner(System.in).nextLine();

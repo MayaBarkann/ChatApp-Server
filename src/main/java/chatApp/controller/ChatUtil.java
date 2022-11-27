@@ -15,17 +15,16 @@ public class ChatUtil {
      * This class is used to send messages to the main room and the private channels.
      *
      */
-    @SendTo("/topic/mainChat")
-    public OutputMessage greeting(HelloMessage message) {
-        throw  new UnsupportedOperationException();
+    public ChatUtil() {
     }
 
     @SendTo("/topic/mainChat")
-    public static OutputMessage writeMessageToMainRoom(OutputMessage message) {
+    public OutputMessage writeMessageToMainRoom(OutputMessage message) {
+        System.out.println("Sending message to main room" + message.getContent());
         return message;
     }
     @SendToUser("")
-    public static OutputMessage writeMessageToPrivateChannel(OutputMessage message) {
+    public OutputMessage writeMessageToPrivateChannel(OutputMessage message) {
         return message;
     }
 
