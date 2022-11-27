@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 
 public class ControllerUtil {
     public static final Pattern VALID_EMAIL_REGEX = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
-    //public static final Pattern VALID_PASSWORD_REGEX = Pattern.compile("^[a-zA-Z0-9_+&*-]+(?:\\."+"[a-zA-Z0-9_+&*-]+)*@"+"(?:[a-zA-Z0-9-]+\\.)+[a-z"+"A-Z]{2,20}$");
     public static final Pattern VALID_PASSWORD_REGEX = Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,20}$");
 
     /**
@@ -22,7 +21,7 @@ public class ControllerUtil {
         if(!isValidResponse.isSucceed()){
             return Response.createFailureResponse(isValidResponse.getMessage());
         }
-        //isValidResponse = isPasswordValid(password);
+        isValidResponse = isPasswordValid(password);
         if(!isValidResponse.isSucceed()){
             return Response.createFailureResponse(isValidResponse.getMessage());
         }
@@ -82,7 +81,7 @@ public class ControllerUtil {
      * @return String that describes valid password conditions.
      */
     private static String passwordConstraints(){
-        return "\n Password must contain:\n" +
+        return "\nInvalid Password. Password must contain:\n" +
                 "At least 8 characters and at most 20 characters.\n" +
                 "At least one digit.\n" +
                 "At least one upper case letter.\n" +
@@ -90,4 +89,5 @@ public class ControllerUtil {
                 "At least one special character which includes !@#$%&*()-+=^.\n" +
                 "Must not contain any white spaces.";
     }
+
 }
