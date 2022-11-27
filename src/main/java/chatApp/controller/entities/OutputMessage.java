@@ -34,6 +34,14 @@ public class OutputMessage {
         return content;
     }
 
+    public String getTime() {
+        return time;
+    }
+
+    public String getReceiver() {
+        return receiver;
+    }
+
     public void setContent(String content) {
         this.content = content;
     }
