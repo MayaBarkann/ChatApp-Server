@@ -1,7 +1,5 @@
 package chatApp.controller.entities;
 
-import chatApp.Entities.User;
-
 public class UserRegister {
     private String email;
     private String password;

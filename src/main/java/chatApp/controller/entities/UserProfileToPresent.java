@@ -1,7 +1,7 @@
 package chatApp.controller.entities;
 
-import chatApp.Entities.User;
-import chatApp.Entities.UserProfile;
+import chatApp.entities.User;
+import chatApp.entities.UserProfile;
 import java.time.LocalDate;
 
 public class UserProfileToPresent {

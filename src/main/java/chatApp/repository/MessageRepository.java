@@ -1,7 +1,7 @@
 package chatApp.repository;
 
-import chatApp.Entities.Message;
-import chatApp.Entities.MessageType;
+import chatApp.entities.Message;
+import chatApp.entities.MessageType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

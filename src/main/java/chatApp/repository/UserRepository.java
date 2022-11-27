@@ -1,6 +1,6 @@
 package chatApp.repository;
 
-import chatApp.Entities.User;
+import chatApp.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
