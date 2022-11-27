@@ -35,7 +35,7 @@ public class MessageController {
         this.chatUtil=chatUtil;
     }
 
-    @SendTo("/topic/mainChat")
+    @PostMapping("MainRoom/Send")
     public ResponseEntity<String> sendPublicMessage(@RequestBody String message,@RequestHeader(HttpHeaders.FROM) int senderId)
     {
         Response<Boolean> response = permissionService.checkPermission(senderId, UserActions.SendMainRoomMessage);
@@ -75,7 +75,7 @@ public class MessageController {
                 String senderName = userService.findUserById(senderId).getData().getUsername();
                 String reciverName = userService.findUserById(reciverID).getData().getUsername();
                 Message privateMessage = messageService.createPrivateMessage(senderId, reciverID, message);
-                chatUtil.writeMessageToPrivateChannel(OutputMessage.createPrivateMessage(privateMessage,senderName,reciverName));
+                chatUtil.writeMessageToPrivateChannel(OutputMessage.createPrivateMessage(privateMessage,senderName,reciverName),reciverID);
                 return ResponseEntity.ok("The message was sent successfully.");
             }
            if(response.getData()) return ResponseEntity.status(401).body("You don't have permission to send a personal message.");
