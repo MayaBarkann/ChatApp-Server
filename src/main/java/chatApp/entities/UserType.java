@@ -1,4 +1,4 @@
-package chatApp.Entities;
+package chatApp.entities;
 
 public enum UserType {
     ADMIN,

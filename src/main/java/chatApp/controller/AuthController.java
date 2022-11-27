@@ -1,6 +1,6 @@
 package chatApp.controller;
 
-import chatApp.Entities.Response;
+import chatApp.entities.Response;
 import chatApp.controller.entities.LoginCredentials;
 import chatApp.service.AuthService;
 import chatApp.service.ServiceUtil;
@@ -32,7 +32,7 @@ public class AuthController {
         if(!userLoginResponse.isSucceed()){
             return ResponseEntity.badRequest().body("Error during User Login. Reason: " + userLoginResponse.getMessage());
         }
-        return ResponseEntity.ok("token: " + userLoginResponse.getData());
+        return ResponseEntity.ok(userLoginResponse.getData());
     }
 
     /**

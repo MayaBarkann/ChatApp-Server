@@ -1,6 +1,6 @@
 package chatApp.service;
 
-import chatApp.Entities.*;
+import chatApp.entities.*;
 import chatApp.repository.UserRepository;
 import org.springframework.stereotype.Service;
 

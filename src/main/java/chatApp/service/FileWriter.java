@@ -1,6 +1,6 @@
 package chatApp.service;
 
-import chatApp.Entities.Response;
+import chatApp.entities.Response;
 
 import java.io.File;
 import java.io.IOException;

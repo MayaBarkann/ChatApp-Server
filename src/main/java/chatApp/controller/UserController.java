@@ -1,10 +1,9 @@
 package chatApp.controller;
 
-import chatApp.Entities.Response;
-import chatApp.Entities.User;
-import chatApp.Entities.UserStatus;
+import chatApp.entities.Response;
+import chatApp.entities.User;
 import chatApp.controller.entities.UserRegister;
-import chatApp.Entities.UserActions;
+import chatApp.entities.UserActions;
 import chatApp.controller.entities.UserToPresent;
 import chatApp.service.PermissionService;
 import chatApp.service.UserActivationService;

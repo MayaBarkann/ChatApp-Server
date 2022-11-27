@@ -1,8 +1,6 @@
 package chatApp.controller.entities;
 
-import chatApp.Entities.Message;
-import chatApp.Entities.MessageType;
-import java.time.LocalDateTime;
+import chatApp.entities.Message;
 
 
 public class OutputMessage {

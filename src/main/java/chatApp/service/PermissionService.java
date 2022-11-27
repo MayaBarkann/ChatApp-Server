@@ -1,9 +1,9 @@
 package chatApp.service;
 
-import chatApp.Entities.PermissionsManager;
-import chatApp.Entities.Response;
-import chatApp.Entities.User;
-import chatApp.Entities.UserActions;
+import chatApp.entities.PermissionsManager;
+import chatApp.entities.Response;
+import chatApp.entities.User;
+import chatApp.entities.UserActions;
 import chatApp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
