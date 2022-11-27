@@ -1,7 +1,7 @@
 package chatApp.controller.entities;
 
-import chatApp.Entities.User;
-import chatApp.Entities.UserType;
+import chatApp.entities.User;
+import chatApp.entities.UserType;
 
 
 public class UserToPresent {

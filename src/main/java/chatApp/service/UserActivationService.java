@@ -1,9 +1,9 @@
 package chatApp.service;
 
-import chatApp.Entities.Response;
-import chatApp.Entities.User;
-import chatApp.Entities.UserProfile;
-import chatApp.Entities.UserType;
+import chatApp.entities.Response;
+import chatApp.entities.User;
+import chatApp.entities.UserProfile;
+import chatApp.entities.UserType;
 import chatApp.repository.UserProfileRepository;
 import chatApp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

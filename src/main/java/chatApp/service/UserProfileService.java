@@ -1,7 +1,7 @@
 package chatApp.service;
 
-import chatApp.Entities.Response;
-import chatApp.Entities.UserProfile;
+import chatApp.entities.Response;
+import chatApp.entities.UserProfile;
 import chatApp.repository.UserProfileRepository;
 import com.google.cloud.storage.*;
 import org.springframework.beans.factory.annotation.Autowired;

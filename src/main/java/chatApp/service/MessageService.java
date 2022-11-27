@@ -1,8 +1,8 @@
 package chatApp.service;
 
-import chatApp.Entities.Message;
-import chatApp.Entities.MessageType;
-import chatApp.Entities.Response;
+import chatApp.entities.Message;
+import chatApp.entities.MessageType;
+import chatApp.entities.Response;
 import chatApp.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

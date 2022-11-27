@@ -1,8 +1,8 @@
 package chatApp.controller;
 
-import chatApp.Entities.Message;
-import chatApp.Entities.Response;
-import chatApp.Entities.UserActions;
+import chatApp.entities.Message;
+import chatApp.entities.Response;
+import chatApp.entities.UserActions;
 import chatApp.controller.entities.OutputMessage;
 import chatApp.service.MessageService;
 import chatApp.service.PermissionService;
@@ -13,7 +13,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;

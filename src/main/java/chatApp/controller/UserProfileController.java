@@ -1,8 +1,8 @@
 package chatApp.controller;
 
-import chatApp.Entities.Response;
-import chatApp.Entities.UserActions;
-import chatApp.Entities.UserProfile;
+import chatApp.entities.Response;
+import chatApp.entities.UserActions;
+import chatApp.entities.UserProfile;
 import chatApp.controller.entities.UserProfileToPresent;
 import chatApp.service.PermissionService;
 import chatApp.service.UserProfileService;
@@ -10,7 +10,7 @@ import chatApp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import chatApp.Entities.User;
+import chatApp.entities.User;
 
 @RestController
 @CrossOrigin

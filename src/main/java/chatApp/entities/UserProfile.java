@@ -1,4 +1,4 @@
-package chatApp.Entities;
+package chatApp.entities;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;

@@ -1,6 +1,6 @@
 package chatApp.controller;
 
-import chatApp.Entities.Response;
+import chatApp.entities.Response;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
