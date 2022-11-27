@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -61,7 +62,9 @@ public class MessageService {
     }
 
     public List<Message> getChannelMessages(int senderId, int reciverId) {
-        return messageRepo.findBySenderIdAndReceiverIdAndMessageType(senderId, reciverId, MessageType.PERSONAL);
+        List<Message> channel = messageRepo.findBySenderIdAndReceiverIdAndMessageType(senderId, reciverId, MessageType.PERSONAL);
+        channel.addAll(messageRepo.findBySenderIdAndReceiverIdAndMessageType(reciverId, senderId, MessageType.PERSONAL));
+        return channel.stream().sorted(Comparator.comparing(Message::getTime)).collect(Collectors.toList());
     }
 
     public List<Message> getAllUserChannels(int senderId) {
