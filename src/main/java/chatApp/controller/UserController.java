@@ -45,6 +45,7 @@ public class UserController {
         if (responseAddUser.isSucceed()) {
             Response<String> responseEmail = userActivationService.sendActivationEmail(userRegister.getEmail());
             if (!responseEmail.isSucceed()) {
+                userService.deleteUserByEmail(userRegister.getEmail());
                 return ResponseEntity.badRequest().body("Problem sending activation email to address: " + responseEmail.getMessage());
             }
             return ResponseEntity.ok("User added successfully: " + UserToPresent.createFromUser(responseAddUser.getData()).toString() + "\nActivation email was sent to: " + userRegister.getEmail());

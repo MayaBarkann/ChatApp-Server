@@ -125,4 +125,7 @@ public class UserService {
 
     }
 
+    public void deleteUserByEmail(String email) {
+        userRepository.deleteByEmail(email);
+    }
 }
