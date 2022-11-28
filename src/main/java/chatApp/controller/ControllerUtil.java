@@ -1,13 +1,15 @@
 package chatApp.controller;
 
 import chatApp.entities.Response;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class ControllerUtil {
     public static final Pattern VALID_EMAIL_REGEX = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
     public static final Pattern VALID_PASSWORD_REGEX = Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,20}$");
+    public static final Logger logger = LogManager.getLogger(ControllerUtil.class);
 
     /**
      * Checks if user email and password are in valid format.
