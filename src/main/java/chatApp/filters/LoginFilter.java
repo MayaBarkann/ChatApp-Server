@@ -1,14 +1,17 @@
 package chatApp.filters;
 
-
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.annotation.Bean;
+import chatApp.service.AuthService;
 
 import javax.servlet.*;
 import java.io.IOException;
 
+public class LoginFilter  implements Filter {
+    private final AuthService authService;
 
-public class LoginFilter implements Filter {
+    public LoginFilter(AuthService authService) {
+        this.authService = authService;
+    }
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         Filter.super.init(filterConfig);
@@ -23,15 +26,4 @@ public class LoginFilter implements Filter {
     public void destroy() {
         Filter.super.destroy();
     }
-    @Bean
-    public FilterRegistrationBean<LoginFilter> filter()
-    {
-        FilterRegistrationBean<LoginFilter> bean = new FilterRegistrationBean<>();
-
-        bean.setFilter(new LoginFilter());
-        bean.addUrlPatterns("/execute/*");  // or, use `setUrlPatterns()`
-
-        return bean;
-    }
 }
-
