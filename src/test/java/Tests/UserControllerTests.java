@@ -5,16 +5,20 @@ import chatApp.controller.UserController;
 import chatApp.controller.entities.UserRegister;
 import chatApp.repository.UserRepository;
 import chatApp.service.UserService;
+import org.aspectj.lang.annotation.Aspect;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = SpringApp.class)
+@EnableAspectJAutoProxy
+@Aspect
 public class UserControllerTests {
     @Autowired
     private UserController userController;
@@ -25,6 +29,7 @@ public class UserControllerTests {
 
 
     @Test
+
     public void testValidSyntaxUserInsert() {
 
         //user with null email.
