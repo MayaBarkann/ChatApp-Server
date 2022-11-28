@@ -27,7 +27,7 @@ public class UserControllerTests {
 
     @Test
     public void testValidSyntaxUserInsert() {
-        /*
+
         //user with null email.
         UserRegister userRegisterInput = new UserRegister(null, "xdssffsf", "username");
         System.out.println(userController.createUser(userRegisterInput).getStatusCode());
@@ -41,7 +41,7 @@ public class UserControllerTests {
         //user with wrong email syntax.
         userRegisterInput.setEmail("wrongEmailSyntax");
         Assertions.assertTrue((userController.createUser(userRegisterInput).getStatusCode().equals(HttpStatus.SC_BAD_REQUEST)),"user with wrong email syntax should return bad request.");
-       */
+
     }
 
 }
