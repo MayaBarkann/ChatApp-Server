@@ -144,7 +144,7 @@ public class UserController {
         return ResponseEntity.badRequest().body("can not change user status - this user does not exist");
     }
 
-    @GetMapping("/get-all-registered-users")
+    @GetMapping("/auth/get-all-registered-users")
     public ResponseEntity<List<UserToPresent>> getAllRegisteredUsers(@RequestParam("userId") int userId){
         Response<Boolean> hasPermissionsToGetAllUsers = permissionService.checkPermission(userId, UserActions.GetAllUsers);
         if(hasPermissionsToGetAllUsers.isSucceed()){
