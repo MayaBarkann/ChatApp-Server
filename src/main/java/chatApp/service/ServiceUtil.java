@@ -3,6 +3,7 @@ package chatApp.service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDateTime;
+import java.util.Base64;
 
 public class ServiceUtil {
 
@@ -49,14 +50,36 @@ public class ServiceUtil {
      * @return boolean, true - if the given token is in correct format, otherwise - false.
      */
     public static boolean isTokenFormatValid(String authToken){
-        String[] tokenParts = authToken.split("-");
+        if(authToken==null){
+            return false;
+        }
         try{
-            Integer.parseInt(tokenParts[0]);
-            Long.parseLong(tokenParts[2]);
+            Long.parseLong(new String(Base64.getDecoder().decode(authToken.split("-")[0])));
+            Long.parseLong(new String(Base64.getDecoder().decode(authToken.split("-")[2])));
         }catch(NumberFormatException e){
             return false;
         }
         return true;
+    }
+
+    /**
+     * Applies a calculation, that can be reversed, on a given number
+     *
+     * @param num long on which the calculation is applied.
+     * @return long, result of the calculation.
+     */
+    public static long encodeWithReversibleFunction(long num){
+        return (7*num)+3;
+    }
+
+    /**
+     * Applies a calculation, that reverses the calculation of the decodeWithReversibleFunction() method, on a given number
+     *
+     * @param num long on which the calculation is applied.
+     * @return long, result of the calculation.
+     */
+    public static long decodeWithReversibleFunction(long num){
+        return (num-3)/7;
     }
 
 }

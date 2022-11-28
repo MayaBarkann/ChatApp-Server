@@ -36,10 +36,11 @@ public class AuthService {
         if (!user.isPresent()) {
             return Response.createFailureResponse("Error during authentication token creation: User with id: " + id + "doesn't exist in database.");
         }
-        long changedId = (long)Math.pow(2*id+1,2);
-        String encodedId = Base64.getEncoder().encodeToString(String.valueOf(id).getBytes());
-
-        String authToken = id + "-" + RandomString.make(64) + "-" + LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond();
+        long changedId = ServiceUtil.encodeWithReversibleFunction(id);
+        String encodedId = Base64.getEncoder().encodeToString(String.valueOf(changedId).getBytes());
+        long changedTime = ServiceUtil.encodeWithReversibleFunction(LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond());
+        String encodedTime = Base64.getEncoder().encodeToString(String.valueOf(changedTime).getBytes());
+        String authToken = encodedId + "-" + RandomString.make(64) + "-" + encodedTime;
         return Response.createSuccessfulResponse(authToken);
     }
 
@@ -158,9 +159,6 @@ public class AuthService {
             return Response.createFailureResponse("Error occurred during logout: token format is invalid.");
         }
         if(authTokensMap.get(userIdByToken)!=null) {
-            System.out.println(userIdByToken);
-            System.out.println("user token from map: " + authTokensMap.get(userIdByToken));
-            System.out.println(authToken);
             if (!authTokensMap.get(userIdByToken).equals(authToken)) {
                 return Response.createFailureResponse("Wrong token.");
             }
@@ -180,7 +178,8 @@ public class AuthService {
         if (!ServiceUtil.isTokenFormatValid(authToken)) {
             return -1;
         }
-        return Integer.parseInt(authToken.split("-")[0]);
+        String decodedString = new String(Base64.getDecoder().decode(authToken.split("-")[0]));
+        return (int)ServiceUtil.decodeWithReversibleFunction(Long.parseLong(decodedString));
     }
 
     /**
@@ -189,12 +188,13 @@ public class AuthService {
      * @param authToken String, user authentication token.
      * @return LocalDateTime when the authentication token what created.
      */
-    public LocalDateTime getTimeFromAuthToken(String authToken) {
+    public Optional<LocalDateTime> getTimeFromAuthToken(String authToken) {
         if (!ServiceUtil.isTokenFormatValid(authToken)) {
-            return null;
+            return Optional.empty();
         }
-        long timeInSeconds = Long.parseLong(authToken.split("-")[2]);
-        return LocalDateTime.ofInstant(Instant.ofEpochSecond(timeInSeconds), ZoneId.systemDefault());
+        String decodedString = new String(Base64.getDecoder().decode(authToken.split("-")[2]));
+        long decodedTime= ServiceUtil.decodeWithReversibleFunction(Long.parseLong(decodedString));
+        return Optional.of(LocalDateTime.ofInstant(Instant.ofEpochSecond(decodedTime), ZoneId.systemDefault()));
     }
 
     /**
