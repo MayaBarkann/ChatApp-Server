@@ -1,47 +1,22 @@
 import chatApp.SpringApp;
-import chatApp.controller.entities.UserRegister;
-import chatApp.entities.MessageAbility;
 import chatApp.entities.User;
-import chatApp.entities.UserStatus;
-import chatApp.entities.UserType;
 import chatApp.repository.UserRepository;
 import chatApp.service.UserService;
-import javafx.application.Application;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringRunner;
-
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-//@ExtendWith(SpringExtension.class)
 
-//@DataJpaTest
-//@SpringBootTest
-//@ContextConfiguration(locations = "file:src/main/webapp/WEB-INF/application-context.xml")
-//@ContextConfiguration(classes=UserRegister.class)
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes=SpringApp.class)
+@SpringBootTest(classes = SpringApp.class)
 public class CreateUserTests {
-
-
-    //@Mock
     @Autowired
-    UserRepository userRepository;
-
-    //@InjectMocks
+    private UserService userService;
     @Autowired
-    UserService userService;
-
+    private UserRepository userRepository;
 
     private final String email = "daria.sokolov@gmail.com";
     private final String password = "hfghF$ff123";
@@ -59,7 +34,7 @@ public class CreateUserTests {
  */
 
     @Test
-    void createNewUser_userNotExistInDBInputCorrect_userAddedToDB(){
+    public void createNewUser_userNotExistInDBInputCorrect_userAddedToDB(){
         //userRepository.deleteByEmail(email);
         userService.addUser(email,password,username);
         user = userRepository.findByEmail(email);
