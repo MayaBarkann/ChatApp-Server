@@ -4,14 +4,16 @@
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </Console>
-        <File name="logfile" fileName="C:\Users\USER\IdeaProjects\ChatApp-Server\logs\log.out">
+        <File name="logfile" fileName="logs/log.out">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </File>
     </Appenders>
     <Loggers>
-        <Root level="Debug">
-            <AppenderRef ref="Console"/>
-            <AppenderRef ref="logfile"/>
+        <Root level="error">
+            <AppenderRef ref="Console" />
         </Root>
+        <Logger name="org" level="info">
+            <AppenderRef ref="logfile" />
+        </Logger>
     </Loggers>
 </Configuration>

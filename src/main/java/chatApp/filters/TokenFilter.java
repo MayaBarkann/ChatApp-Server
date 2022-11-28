@@ -4,7 +4,8 @@ package chatApp.filters;
 import chatApp.entities.Response;
 import chatApp.filters.entities.MutableHttpServletRequest;
 import chatApp.service.AuthService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -13,6 +14,7 @@ import java.io.IOException;
 
 
 public class TokenFilter implements Filter {
+    public static final Logger logger = LogManager.getLogger(TokenFilter.class);
     private final AuthService authService;
     public TokenFilter(AuthService authService) {
         this.authService = authService;
@@ -25,7 +27,7 @@ public class TokenFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        System.out.println("Auth filter is working on the following request: " + servletRequest);
+        logger.info("Auth filter is working on the following request: " + servletRequest);
         MutableHttpServletRequest req =new MutableHttpServletRequest ((HttpServletRequest) servletRequest);
         HttpServletResponse res = (HttpServletResponse) servletResponse;
         String authToken = req.getHeader("Authorization");
