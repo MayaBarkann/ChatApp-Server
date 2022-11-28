@@ -125,6 +125,11 @@ public class UserService {
 
     }
 
+    /**
+     * Delete user with given email from table user in DB.
+     *
+     * @param email String user's email to delete him by
+     */
     public void deleteUserByEmail(String email) {
         userRepository.deleteByEmail(email);
     }
