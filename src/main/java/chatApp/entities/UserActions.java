@@ -8,6 +8,7 @@ public enum UserActions {
     MuteOrUnmuteOthers,
     HasProfile,
     ViewProfile,
-    ChangeStatus
+    ChangeStatus,
+    GetAllUsers
 
 }

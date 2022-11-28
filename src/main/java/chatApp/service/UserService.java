@@ -1,11 +1,14 @@
 package chatApp.service;
 
+import chatApp.controller.entities.UserToPresent;
 import chatApp.entities.*;
 import chatApp.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -54,7 +57,6 @@ public class UserService {
         if(!response.isSucceed()){
             return Response.createFailureResponse(response.getMessage());
         }
-        // newUser.setPassword(newUser.getPassword());
         newUser.setPassword(ServiceUtil.encryptPassword(newUser.getPassword()));
         newUser.setUserType(UserType.NOT_ACTIVATED);
         newUser.setUserStatus(UserStatus.OFFLINE);
@@ -133,5 +135,14 @@ public class UserService {
      */
     public void deleteUserByEmail(String email) {
         userRepository.deleteByEmail(email);
+    }
+
+    /**
+     *
+     * @return all registered users
+     */
+    public List<User> getAllRegisteredUser(){
+        return userRepository.findAll().stream().filter(
+                user->user.getUserType().equals(UserType.REGISTERED) || user.getUserType().equals(UserType.ADMIN)).collect(Collectors.toList());
     }
 }

@@ -17,6 +17,7 @@ public class UserProfileService {
     private final Storage storage;
     private final UserProfileRepository userProfileRepository;
     private static final String URL_TEMPLATE = "https://storage.cloud.google.com/chatapp-ec932.appspot.com/%s";
+    private static final String BUCKET = "chatapp-ec932.appspot.com";
 
     @Autowired
     public UserProfileService(UserProfileRepository userProfileRepository, Storage storage){
@@ -42,17 +43,58 @@ public class UserProfileService {
      * Edit user profile, saving the new user profile to the user profile database. If we want to update/upload image,
      * the image is saved in a bucket in fire base and we save the url of the image in the user profile repository.
      * @param userProfile
-     * @param localImagePath path to the user image in case we want to update the
-     * @return response with the user profile
+     * @return response with the user profile saved to repository
      */
 
-    public Response<UserProfile> editUserProfile(UserProfile userProfile, String localImagePath){
-        if(userProfileRepository.findById(userProfile.getId()) != null){
-            if (localImagePath != null){
-                if (!localImagePath.isEmpty() && !uploadImage(userProfile, localImagePath).isSucceed()){
+//    public Response<UserProfile> editUserProfile(UserProfileToPresent userProfileToPresent, String localImagePath, int id){
+//        UserProfile userProfile = userProfileRepository.findById(id);
+//        if(userProfile != null){
+//            UserProfile newUserProfile = UserProfile.createUserProfileFromIdAndUserProfileToPresent(id, userProfile.isPublic(), userProfileToPresent);
+//            if (localImagePath != null){
+//                if (!localImagePath.isEmpty() && !uploadImage(newUserProfile, localImagePath).isSucceed()){
+//
+//                    return Response.createFailureResponse("user profile edition failed- could not upload image to profile");
+//                }
+//            }
+//            userProfileRepository.save(newUserProfile);
+//
+//            return Response.createSuccessfulResponse(newUserProfile);
+//        }
+//
+//        return Response.createFailureResponse("user profile not exists");
+//    }
 
-                    return Response.createFailureResponse("user profile edition failed- could not upload image to profile");
-                }
+//    public Response<UserProfile> editUserProfile(UserProfileToPresent userProfileToPresent, int id){
+//        UserProfile userProfile = userProfileRepository.findById(id);
+//        String imagePath = userProfileToPresent.getImageUrl();
+//        if(userProfile != null){
+//            UserProfile newUserProfile = UserProfile.createUserProfileFromIdAndUserProfileToPresent(id, userProfile.isPublic(), userProfileToPresent);
+//            if (!imagePath.equals(userProfile.getImageUrl())){
+//                if(imagePath == null || imagePath.isEmpty()){
+//                    storage.delete(BUCKET, Integer.toString(id));
+//                } else if (!imagePath.isEmpty() && !uploadImage(newUserProfile, imagePath).isSucceed()){
+//
+//                    return Response.createFailureResponse("user profile edition failed- could not upload image to profile");
+//                }
+//            }
+//            userProfileRepository.save(newUserProfile);
+//
+//            return Response.createSuccessfulResponse(newUserProfile);
+//        }
+//
+//        return Response.createFailureResponse("user profile not exists");
+//    }
+
+    public Response<UserProfile> editUserProfile(UserProfile userProfile){
+
+        if(userProfile != null && userProfileRepository.findById(userProfile.getId()) != null){
+            String newImagePath = userProfile.getImageUrl();
+
+            if(newImagePath == null || newImagePath.isEmpty()){
+                storage.delete(BUCKET, Integer.toString(userProfile.getId()));
+            } else if (!newImagePath.isEmpty() && !uploadImage(userProfile, newImagePath).isSucceed()){
+
+                return Response.createFailureResponse("user profile edition failed- could not upload image to profile");
             }
             userProfileRepository.save(userProfile);
 
@@ -64,7 +106,7 @@ public class UserProfileService {
 
     private Response<UserProfile> uploadImage(UserProfile userProfile, String localPath){
         int id = userProfile.getId();
-        BlobId blobId = BlobId.of("chatapp-ec932.appspot.com",Integer.toString(id));
+        BlobId blobId = BlobId.of(BUCKET,Integer.toString(id));
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
         File fileToRead = new File(localPath);
         try{
