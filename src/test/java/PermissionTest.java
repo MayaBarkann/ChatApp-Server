@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 
 public class PermissionTest {
     /*
+    insert into CHATAPP.user(id,username,email,password,userType) values(6,"SuperSuper","super1@gmail.com","Pass2@#as","ADMIN");
+    insert into CHATAPP.user(id,username,email,password,userType) values(5,"Super","super@gmail.com","Pass@#as","ADMIN");
      insert into CHATAPP.user(id,username,email,password,userType) values(4,"Nota-User","usie@gmail3.com","password","NOT_ACTIVATED");
      insert into CHATAPP.user(id,username,email,password,userType) values(3,"guest-User","usie@gmail4.com","password","GUEST");
      insert into CHATAPP.user(id,username,email,password,userType) values(2,"register-User","usie@gmail1.com","password","REGISTERED");

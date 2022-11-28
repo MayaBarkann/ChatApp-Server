@@ -21,6 +21,7 @@ import java.util.Optional;
 
 @CrossOrigin
 @RestController
+@RequestMapping("/auth")
 public class MessageController {
     private final  MessageService messageService;
     private final PermissionService permissionService;
@@ -34,7 +35,7 @@ public class MessageController {
         this.chatUtil=chatUtil;
     }
 
-    @PostMapping("MainRoom/Send")
+    @PostMapping("/MainRoom/Send")
     public ResponseEntity<String> sendPublicMessage(@RequestBody String message,@RequestHeader(HttpHeaders.FROM) int senderId)
     {
         Response<Boolean> response = permissionService.checkPermission(senderId, UserActions.SendMainRoomMessage);
@@ -50,7 +51,7 @@ public class MessageController {
         }
         return ResponseEntity.badRequest().body("user not found.");
     }
-    @GetMapping("MainRoom/Get")
+    @GetMapping("/MainRoom/Get")
     public ResponseEntity<List<Message>> getAllMainRoomMessages(@RequestParam int userID,@RequestParam(required = false) LocalDateTime start,@RequestParam(required = false) LocalDateTime end)
     {
         Response<Boolean> response = permissionService.checkPermission(userID, UserActions.ReceiveMainRoomMessage);
@@ -63,7 +64,7 @@ public class MessageController {
         }
         return ResponseEntity.badRequest().body(null);
     }
-    @PostMapping("channel/send")
+    @PostMapping("/channel/send")
     public ResponseEntity<String> sendPersonalMessage(@RequestParam int senderId,@RequestParam int reciverID,@RequestBody String message)
     {
         Response<Boolean> response = permissionService.checkPermission(senderId, UserActions.SendPersonalMessage);
@@ -74,7 +75,7 @@ public class MessageController {
                 String senderName = userService.findUserById(senderId).getData().getUsername();
                 String reciverName = userService.findUserById(reciverID).getData().getUsername();
                 Message privateMessage = messageService.createPrivateMessage(senderId, reciverID, message);
-                chatUtil.writeMessageToPrivateChannel(OutputMessage.createPrivateMessage(privateMessage,senderName,reciverName),reciverID);
+                chatUtil.writeMessageToPrivateChannel(OutputMessage.createPrivateMessage(privateMessage,senderName,reciverName));
                 return ResponseEntity.ok("The message was sent successfully.");
             }
            if(response.getData()) return ResponseEntity.status(401).body("You don't have permission to send a personal message.");
@@ -83,14 +84,14 @@ public class MessageController {
        if(!response.isSucceed()) return ResponseEntity.badRequest().body("sender not found.");
        return ResponseEntity.badRequest().body("reciver not found.");
     }
-    @GetMapping("channel/get")
+    @GetMapping("/channel/get")
     public ResponseEntity<List<Message>> getPersonalMessages(@RequestParam int senderId,@RequestParam int reciverId)
     {
         List<Message> result;
         result=messageService.getChannelMessages(senderId,reciverId);
         return  ResponseEntity.ok(result);
     }
-    @GetMapping("channel/getAll")
+    @GetMapping("/channel/getAll")
     public ResponseEntity<List<Message>> getAllUserChannels(@RequestParam int userId)
     {
         Response<Boolean> response = permissionService.checkPermission(userId, UserActions.ReceivePersonalMessage);

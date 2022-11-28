@@ -12,10 +12,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 
-public class LoginFilter implements Filter {
+public class TokenFilter implements Filter {
     private final AuthService authService;
-    @Autowired
-    public LoginFilter(AuthService authService) {
+    public TokenFilter(AuthService authService) {
         this.authService = authService;
     }
 

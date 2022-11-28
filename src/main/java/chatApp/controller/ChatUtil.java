@@ -26,9 +26,9 @@ public class ChatUtil {
         return message;
     }
 
-    public OutputMessage writeMessageToPrivateChannel(OutputMessage message,int userId) {
+    public OutputMessage writeMessageToPrivateChannel(OutputMessage message) {
         System.out.println("Sending message to private channel" + message.getContent());
-        template.convertAndSendToUser(String.valueOf(userId),"/",message);
+        template.convertAndSendToUser(message.getReceiver(),"/",message);
         return message;
     }
 
