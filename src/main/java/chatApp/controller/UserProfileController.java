@@ -85,7 +85,4 @@ public class UserProfileController {
 
         return ResponseEntity.badRequest().body(null);
     }
-
-
-
 }

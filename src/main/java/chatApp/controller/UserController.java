@@ -12,6 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
 @CrossOrigin
 public class UserController {
@@ -138,6 +142,23 @@ public class UserController {
         }
 
         return ResponseEntity.badRequest().body("can not change user status - this user does not exist");
+    }
+
+    @GetMapping("/get-all-registered-users")
+    public ResponseEntity<List<UserToPresent>> getAllRegisteredUsers(@RequestParam("userId") int userId){
+        Response<Boolean> hasPermissionsToGetAllUsers = permissionService.checkPermission(userId, UserActions.GetAllUsers);
+        if(hasPermissionsToGetAllUsers.isSucceed()){
+            if(hasPermissionsToGetAllUsers.getData()){
+                List<UserToPresent> listOfRegisteredUsers =
+                        userService.getAllRegisteredUser().stream().map(UserToPresent :: createFromUser).collect(Collectors.toList());
+
+                return ResponseEntity.ok(listOfRegisteredUsers);
+            }
+
+            return ResponseEntity.status(401).body(null);
+        }
+
+        return ResponseEntity.badRequest().body(null);
     }
 
 

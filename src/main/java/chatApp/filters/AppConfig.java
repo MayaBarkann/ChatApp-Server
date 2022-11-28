@@ -19,8 +19,6 @@ public class AppConfig {
         this.authService = authService;
         this.userService = userService;
         Response<User> userById =  userService.findUserById(6);
-        System.out.println("userById = " + userById.getData().getEmail());
-        System.out.println("userById = " + userById.getData().getPassword());
     }/*
     @Bean
     public FilterRegistrationBean<LoginFilter> loginFilterBean() {
