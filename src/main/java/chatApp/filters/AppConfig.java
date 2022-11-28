@@ -12,15 +12,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class AppConfig {
     private final AuthService authService;
-    private final UserService userService;
+
     @Autowired
-    public AppConfig(AuthService authService, UserService userService) {
+    public AppConfig(AuthService authService) {
         System.out.println("AppConfig is created");
         this.authService = authService;
-        this.userService = userService;
-        Response<User> userById =  userService.findUserById(6);
-        System.out.println("userById = " + userById.getData().getEmail());
-        System.out.println("userById = " + userById.getData().getPassword());
     }/*
     @Bean
     public FilterRegistrationBean<LoginFilter> loginFilterBean() {

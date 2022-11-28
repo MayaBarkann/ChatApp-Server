@@ -59,9 +59,9 @@ public class UserController {
      */
     @RequestMapping(method = RequestMethod.GET, value = "/activate/{activationToken}")
     public ResponseEntity<String> activateUser(@PathVariable("activationToken") String activationToken) {
-        Response<User> response = userActivationService.activateUser(activationToken);
+        Response<String> response = userActivationService.activateUser(activationToken);
         if (response.isSucceed()) {
-            return ResponseEntity.ok("Account of " + response.getData().toString() + " was activated successfully.");
+            return ResponseEntity.ok("Account with email" + response.getData() + " was activated successfully.");
         }
         return ResponseEntity.badRequest().body(response.getMessage());
     }
