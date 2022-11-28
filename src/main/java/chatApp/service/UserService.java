@@ -54,6 +54,7 @@ public class UserService {
         if(!response.isSucceed()){
             return Response.createFailureResponse(response.getMessage());
         }
+        //newUser.setPassword(newUser.getPassword());
         newUser.setPassword(ServiceUtil.encryptPassword(newUser.getPassword()));
         newUser.setUserType(UserType.NOT_ACTIVATED);
         newUser.setUserStatus(UserStatus.OFFLINE);
