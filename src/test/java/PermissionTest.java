@@ -1,15 +1,8 @@
 import chatApp.entities.PermissionsManager;
-import chatApp.entities.Response;
 import chatApp.entities.UserActions;
 import chatApp.entities.UserType;
-import chatApp.repository.UserRepository;
-import chatApp.service.PermissionService;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-
 
 
 public class PermissionTest {
