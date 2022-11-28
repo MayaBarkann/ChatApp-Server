@@ -10,12 +10,8 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
-//TODO: check that methods work
 @Service
 public class AuthService {
 
@@ -40,8 +36,11 @@ public class AuthService {
         if (!user.isPresent()) {
             return Response.createFailureResponse("Error during authentication token creation: User with id: " + id + "doesn't exist in database.");
         }
-        String authToken = id + "-" + RandomString.make(64) + "-" + LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond();
-        ;
+        long changedId = ServiceUtil.encodeWithReversibleFunction(id);
+        String encodedId = Base64.getEncoder().encodeToString(String.valueOf(changedId).getBytes());
+        long changedTime = ServiceUtil.encodeWithReversibleFunction(LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond());
+        String encodedTime = Base64.getEncoder().encodeToString(String.valueOf(changedTime).getBytes());
+        String authToken = encodedId + "-" + RandomString.make(64) + "-" + encodedTime;
         return Response.createSuccessfulResponse(authToken);
     }
 
@@ -118,7 +117,6 @@ public class AuthService {
         }
         String authToken = this.createAuthToken(guestUser.getId()).getData();
         authTokensMap.put(guestUser.getId(),authToken);
-        System.out.println(authTokensMap.get(guestUser.getId()));//TODO: erase
         return Response.createSuccessfulResponse(authToken);
     }
 
@@ -130,8 +128,7 @@ public class AuthService {
      * @return Response<String> object, if action succeeded - holds user's username, otherwise - holds error message.
      */
     public Response<String> userLogout(String authToken) {
-        System.out.println(authToken); //TODO: erase
-        Response<String> checkTokenResponse = this.isTokenCorrect(authToken);
+        Response<Integer> checkTokenResponse = this.isTokenCorrect(authToken);
         if (!checkTokenResponse.isSucceed()) {
             return Response.createFailureResponse("Error occurred during logout: " + checkTokenResponse.getMessage());
         }
@@ -156,22 +153,19 @@ public class AuthService {
      * @param authToken String, user's authentication token.
      * @return Response<String>, if token is correct - holds the token, otherwise - holds error message.
      */
-    public Response<String> isTokenCorrect(String authToken) {
+    public Response<Integer> isTokenCorrect(String authToken) {
         int userIdByToken = getIdFromAuthToken(authToken);
         if(userIdByToken==-1){
             return Response.createFailureResponse("Error occurred during logout: token format is invalid.");
         }
         if(authTokensMap.get(userIdByToken)!=null) {
-            System.out.println(userIdByToken);
-            System.out.println("user token from map: " + authTokensMap.get(userIdByToken));
-            System.out.println(authToken);
             if (!authTokensMap.get(userIdByToken).equals(authToken)) {
                 return Response.createFailureResponse("Wrong token.");
             }
         }else{
             return Response.createFailureResponse("User has no token.");
         }
-        return Response.createSuccessfulResponse(authToken);
+        return Response.createSuccessfulResponse(getIdFromAuthToken(authToken));
     }
 
     /**
@@ -184,7 +178,8 @@ public class AuthService {
         if (!ServiceUtil.isTokenFormatValid(authToken)) {
             return -1;
         }
-        return Integer.parseInt(authToken.split("-")[0]);
+        String decodedString = new String(Base64.getDecoder().decode(authToken.split("-")[0]));
+        return (int)ServiceUtil.decodeWithReversibleFunction(Long.parseLong(decodedString));
     }
 
     /**
@@ -193,12 +188,13 @@ public class AuthService {
      * @param authToken String, user authentication token.
      * @return LocalDateTime when the authentication token what created.
      */
-    public LocalDateTime getTimeFromAuthToken(String authToken) {
+    public Optional<LocalDateTime> getTimeFromAuthToken(String authToken) {
         if (!ServiceUtil.isTokenFormatValid(authToken)) {
-            return null;
+            return Optional.empty();
         }
-        long timeInSeconds = Long.parseLong(authToken.split("-")[2]);
-        return LocalDateTime.ofInstant(Instant.ofEpochSecond(timeInSeconds), ZoneId.systemDefault());
+        String decodedString = new String(Base64.getDecoder().decode(authToken.split("-")[2]));
+        long decodedTime= ServiceUtil.decodeWithReversibleFunction(Long.parseLong(decodedString));
+        return Optional.of(LocalDateTime.ofInstant(Instant.ofEpochSecond(decodedTime), ZoneId.systemDefault()));
     }
 
     /**

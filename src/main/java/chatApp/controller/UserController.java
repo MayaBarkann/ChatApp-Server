@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/user")
 public class UserController {
 
     @Autowired
@@ -93,7 +92,7 @@ public class UserController {
      * @return Successful response if the toggle succeeded otherwise- failure response with the reason
      */
 
-    @PutMapping("/toggle-mute-unmute")
+    @PutMapping("/auth/toggle-mute-unmute")
     public ResponseEntity<String> toggleMuteUnmute(@RequestParam("userIdPerformsTheToggle") int userIdPerformsTheToggle, @RequestParam("userIdToToggle") int userIdToToggle){
         Response<Boolean> responseHasPermissionsToToggle = permissionService.checkPermission(userIdPerformsTheToggle,UserActions.MuteOrUnmuteOthers);
         Response<Boolean> responseUserExistsAndCanBeToggledByOthers = permissionService.checkPermission(userIdToToggle,UserActions.MuteOrUnmuteOthers);
@@ -120,7 +119,7 @@ public class UserController {
      * @return response entity
      */
 
-    @PutMapping("/change-status")
+    @PutMapping("/auth/change-status")
     public ResponseEntity<String> changeStatus(@RequestParam("userId") int userId){
         //todo: add a check (at filter layer) that checks that the user is connected
         Response<Boolean> hasPermissionsToChangeStatus = permissionService.checkPermission(userId, UserActions.ChangeStatus);

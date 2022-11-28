@@ -54,8 +54,8 @@ public class UserService {
         if(!response.isSucceed()){
             return Response.createFailureResponse(response.getMessage());
         }
-        //newUser.setPassword(newUser.getPassword());
-        newUser.setPassword(ServiceUtil.encryptPassword(newUser.getPassword()));
+        newUser.setPassword(newUser.getPassword());
+       // newUser.setPassword(ServiceUtil.encryptPassword(newUser.getPassword()));
         newUser.setUserType(UserType.NOT_ACTIVATED);
         newUser.setUserStatus(UserStatus.OFFLINE);
         newUser.setMessageAbility(MessageAbility.UNMUTED);
@@ -126,6 +126,11 @@ public class UserService {
 
     }
 
+    /**
+     * Delete user with given email from table user in DB.
+     *
+     * @param email String user's email to delete him by
+     */
     public void deleteUserByEmail(String email) {
         userRepository.deleteByEmail(email);
     }

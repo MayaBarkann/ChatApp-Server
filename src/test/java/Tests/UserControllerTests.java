@@ -5,7 +5,6 @@ import chatApp.controller.UserController;
 import chatApp.controller.entities.UserRegister;
 import chatApp.repository.UserRepository;
 import chatApp.service.UserService;
-import org.apache.http.HttpStatus;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
@@ -29,19 +28,21 @@ public class UserControllerTests {
     public void testValidSyntaxUserInsert() {
 
         //user with null email.
-        UserRegister userRegisterInput = new UserRegister(null, "xdssffsf", "username");
+        UserRegister userRegisterInput = new UserRegister(null, "password", "username");
         System.out.println(userController.createUser(userRegisterInput).getStatusCode());
-        Assertions.assertTrue(userController.createUser(userRegisterInput).getStatusCode().equals(HttpStatus.SC_BAD_REQUEST),"user with null email should return bad request.");
+        Assertions.assertTrue(checkStatus(userController.createUser(userRegisterInput),400),"user with null email should return bad request.");
        //user with empty email.
         userRegisterInput.setEmail("");
-        Assertions.assertTrue(userController.createUser(userRegisterInput).getStatusCode().equals(HttpStatus.SC_BAD_REQUEST),"user with empty email should return bad request.");
+        Assertions.assertTrue(checkStatus(userController.createUser(userRegisterInput),400),"user with empty email should return bad request.");
         //user with only spaces in email.
         userRegisterInput.setEmail("  ");
-        Assertions.assertTrue((userController.createUser(userRegisterInput).getStatusCode().equals(HttpStatus.SC_BAD_REQUEST)),"user with only spaces in email should return bad request.");
+        Assertions.assertTrue(checkStatus(userController.createUser(userRegisterInput),400),"user with only spaces in email should return bad request.");
         //user with wrong email syntax.
         userRegisterInput.setEmail("wrongEmailSyntax");
-        Assertions.assertTrue((userController.createUser(userRegisterInput).getStatusCode().equals(HttpStatus.SC_BAD_REQUEST)),"user with wrong email syntax should return bad request.");
+        Assertions.assertTrue(checkStatus(userController.createUser(userRegisterInput),400),"user with wrong email syntax should return bad request.");
 
     }
-
+    private  boolean checkStatus(ResponseEntity<String> responseEntity, int expectedStatus){
+        return responseEntity.getStatusCode().value()== expectedStatus;
+    }
 }
