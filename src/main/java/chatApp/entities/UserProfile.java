@@ -22,18 +22,18 @@ public class UserProfile {
 
     public UserProfile() { }
 
-    public static UserProfile createUserProfileFromIdAndUserProfileToPresent(int id, boolean isPublic, UserProfileToPresent userProfileToPresent){
-        UserProfile userProfile = new UserProfile();
-        userProfile.id = id;
-        userProfile.firstName = userProfileToPresent.getFirstName();
-        userProfile.lastName = userProfileToPresent.getLastName();
-        userProfile.dateOfBirth = userProfileToPresent.getDateOfBirth();
-        userProfile.description = userProfileToPresent.getDescription();
-        userProfile.isPublic = isPublic;
-        userProfile.imageUrl = userProfileToPresent.getImageUrl();
-        return userProfile;
-
-    }
+//    public static UserProfile createUserProfileFromIdAndUserProfileToPresent(int id, boolean isPublic, UserProfileToPresent userProfileToPresent){
+//        UserProfile userProfile = new UserProfile();
+//        userProfile.id = id;
+//        userProfile.firstName = userProfileToPresent.getFirstName();
+//        userProfile.lastName = userProfileToPresent.getLastName();
+//        userProfile.dateOfBirth = userProfileToPresent.getDateOfBirth();
+//        userProfile.description = userProfileToPresent.getDescription();
+//        userProfile.isPublic = isPublic;
+//        userProfile.imageUrl = userProfileToPresent.getImageUrl();
+//        return userProfile;
+//
+//    }
 
     public UserProfile(int id) {
         this.id = id;

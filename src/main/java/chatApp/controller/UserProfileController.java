@@ -27,18 +27,17 @@ public class UserProfileController {
     /***
      * Edit user profile by users id.
      * Checks if the user has the permission to do so and if so - updates the user profile.
-     * @param userProfileToPresent new user profile to present with the values we want to edit and the values we want to keep
-     * @param localImagePath path to the image in case we want to update the image, if not then pass empty string.
+     * @param userProfile new user profile with the values we want to edit and the values we want to keep
      * @return response entity with status 200 if the user profile was updated successfully
      */
     @PutMapping("/edit")
     //public ResponseEntity<String> editUserProfile(@RequestBody UserProfileToPresent userProfileToPresent, @RequestParam("path") String localImagePath, @RequestParam("id") int id){
-    public ResponseEntity<String> editUserProfile(@RequestBody UserProfileToPresent userProfileToPresent, @RequestParam("id") int id){
+    public ResponseEntity<String> editUserProfile(@RequestBody UserProfile userProfile){
 
-            if(userProfileToPresent == null){
+        if(userProfile == null){
             return ResponseEntity.badRequest().body("user not found.");
         }
-        Response<Boolean> response = permissionService.checkPermission(id, UserActions.HasProfile);
+        Response<Boolean> response = permissionService.checkPermission(userProfile.getId(), UserActions.HasProfile);
         if (!response.isSucceed()){
             return ResponseEntity.badRequest().body("user not found.");
 
@@ -47,7 +46,7 @@ public class UserProfileController {
 
         }
 
-        Response<UserProfile> responseEdit = userProfileService.editUserProfile(userProfileToPresent, id);
+        Response<UserProfile> responseEdit = userProfileService.editUserProfile(userProfile);
 
         if(!responseEdit.isSucceed()){
             return ResponseEntity.status(401).body(responseEdit.getMessage());
@@ -86,5 +85,7 @@ public class UserProfileController {
 
         return ResponseEntity.badRequest().body(null);
     }
+
+
 
 }
