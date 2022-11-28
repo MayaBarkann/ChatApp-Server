@@ -140,7 +140,7 @@ public class UserActivationService {
         if(!response.isSucceed()){
             return response;
         }
-        String activationLink="http://localhost:8080/user/activate/"+this.newActivationToken(toEmail);
+        String activationLink="http://localhost:8080/activate/"+this.newActivationToken(toEmail);
         String content = "To activate your ChatApp account, please press the following link: \n" + activationLink +"\n" + "The link will be active for the next 24 hours.";
         String subject = "Activation Email for ChatApp";
         Response<String> emailSenderResponse = emailSender.sendMail(subject,content,toEmail);

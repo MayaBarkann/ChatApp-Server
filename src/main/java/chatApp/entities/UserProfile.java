@@ -1,5 +1,8 @@
 package chatApp.entities;
 
+import chatApp.controller.entities.UserProfileToPresent;
+import net.bytebuddy.asm.Advice;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -18,6 +21,19 @@ public class UserProfile {
     private String imageUrl;
 
     public UserProfile() { }
+
+//    public static UserProfile createUserProfileFromIdAndUserProfileToPresent(int id, boolean isPublic, UserProfileToPresent userProfileToPresent){
+//        UserProfile userProfile = new UserProfile();
+//        userProfile.id = id;
+//        userProfile.firstName = userProfileToPresent.getFirstName();
+//        userProfile.lastName = userProfileToPresent.getLastName();
+//        userProfile.dateOfBirth = userProfileToPresent.getDateOfBirth();
+//        userProfile.description = userProfileToPresent.getDescription();
+//        userProfile.isPublic = isPublic;
+//        userProfile.imageUrl = userProfileToPresent.getImageUrl();
+//        return userProfile;
+//
+//    }
 
     public UserProfile(int id) {
         this.id = id;
@@ -66,4 +82,5 @@ public class UserProfile {
     public void setDescription(String description) {
         this.description = description;
     }
+
 }
