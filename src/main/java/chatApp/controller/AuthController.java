@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 //TODO: check all methods
 @RestController
 @CrossOrigin
-@RequestMapping("/auth")
 public class AuthController {
     @Autowired
     private AuthService authService;
@@ -63,7 +62,7 @@ public class AuthController {
      * @param authToken String, user's authentication token.
      * @return ResponseEntity<String>, if action succeeded - holds logged-out user's username, otherwise - error message.
      */
-    @RequestMapping(value = "/logout" ,method = RequestMethod.GET)
+    @RequestMapping(value = "auth/logout" ,method = RequestMethod.GET)
     public ResponseEntity<String> userLogout(@RequestHeader("token") String authToken) {
         if(!ServiceUtil.isTokenFormatValid(authToken)){
             return ResponseEntity.badRequest().body("Error during logout. Reason: Token format is invalid.");
