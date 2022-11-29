@@ -1,12 +1,23 @@
 package chatApp.entities;
 
 import javax.persistence.*;
+import javax.swing.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
 @Entity
 @Table(name="Message")
 public class Message {
     private static final int MainRoomId=-1;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private int id;
+    @Column(nullable = false)
+    private String content;
+    private int senderId; //TODO: add not null to column?
+    private int receiverId;
+    private LocalDateTime time; //TODO: add not null to column?
+    @Enumerated(EnumType.STRING)
+    private MessageType messageType;
     public Message() {
 
     }//Don't use.
@@ -29,15 +40,7 @@ public class Message {
         message.messageType=MessageType.MAIN_ROOM;
         return message;
     }
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
-    @Column(nullable = false)
-    private String content;
-    private int senderId; //TODO: add not null to column?
-    private int receiverId;
-    private LocalDateTime time; //TODO: add not null to column?
-    private MessageType messageType;
+
 
     public int getId() {
         return id;
@@ -99,4 +102,5 @@ public class Message {
                 ", time=" + time +
                 '}';
     }
+
 }

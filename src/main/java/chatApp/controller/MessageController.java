@@ -16,7 +16,9 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @CrossOrigin
@@ -104,6 +106,24 @@ public class MessageController {
             return ResponseEntity.status(401).body(null);
         }
         return ResponseEntity.badRequest().body(null);
+    }
+
+    @GetMapping("/channel/get-all-private-messages")
+    public ResponseEntity<Map<String, List<Message>>> getAllPrivateMessagesByUserId(@RequestParam int userId){
+        Response<Boolean> response = permissionService.checkPermission(userId, UserActions.ReceivePersonalMessage);
+        if(response.isSucceed())
+        {
+            if(response.getData()) {
+                Map<Integer, List<Message>> sortedChannelMessagesById = messageService.getAllPrivateMessagesByUserIdSortedByTime(userId);
+                Map<String, List<Message>> sortedChannelMessagesByUserName = new HashMap<>();
+                sortedChannelMessagesById.forEach((k,v) -> sortedChannelMessagesByUserName.put(userService.getUserNameById(k), v));
+
+                return ResponseEntity.ok(sortedChannelMessagesByUserName);
+            }
+            return ResponseEntity.status(401).body(null);
+        }
+        return ResponseEntity.badRequest().body(null);
+
     }
 
 }

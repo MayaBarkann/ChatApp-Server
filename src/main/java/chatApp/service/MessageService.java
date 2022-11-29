@@ -5,14 +5,13 @@ import chatApp.entities.MessageType;
 import chatApp.entities.Response;
 import chatApp.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -69,6 +68,18 @@ public class MessageService {
 
     public List<Message> getAllUserChannels(int senderId) {
         return messageRepo.findBySenderIdOrReceiverIdAndMessageType(senderId, senderId, MessageType.PERSONAL);
+    }
+
+    public Map<Integer, List<Message>> getAllPrivateMessagesByUserIdSortedByTime(int userId) {
+        List<Message> allMessages = getAllUserChannels(userId);
+        Map<Integer, List<Message>> privateMessages =  allMessages.stream().collect(Collectors.groupingBy(
+                message -> message.getReceiverId() != userId ? message.getReceiverId(): message.getSenderId()));
+        //todo: check if there is a prettier way
+        for(List<Message> messages : privateMessages.values()){
+            messages.sort(Comparator.comparing(Message::getTime));
+        }
+
+       return privateMessages;
     }
 
 }
