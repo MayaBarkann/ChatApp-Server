@@ -29,6 +29,7 @@ public class MessageController {
     private final ChatUtil chatUtil;
      @Autowired
     public MessageController(MessageService messageService,PermissionService permissionService,UserService userService,ChatUtil chatUtil) {
+       ControllerUtil.logger.info("MessageController constructor");
         this.messageService = messageService;
         this.permissionService=permissionService;
         this.userService=userService;

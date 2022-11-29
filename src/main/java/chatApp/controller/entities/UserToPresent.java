@@ -2,8 +2,11 @@ package chatApp.controller.entities;
 
 import chatApp.entities.User;
 import chatApp.entities.UserType;
+import lombok.Getter;
+import lombok.Setter;
 
-
+@Getter
+@Setter
 public class UserToPresent {
     private final String username;
     private final String email;

@@ -1,12 +1,14 @@
 package chatApp.service;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDateTime;
 import java.util.Base64;
 
 public class ServiceUtil {
-
+    public static final Logger logger = LogManager.getLogger(ServiceUtil.class);
     /**
      * Checks if the given date is between two other given dates.
      *
