@@ -1,9 +1,6 @@
 package chatApp.service;
 
-import chatApp.entities.PermissionsManager;
-import chatApp.entities.Response;
-import chatApp.entities.User;
-import chatApp.entities.UserActions;
+import chatApp.entities.*;
 import chatApp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,12 +15,20 @@ public class PermissionService {
         this.userRepository = userRepository;
     }
     public Response<Boolean> checkPermission(int userId, UserActions action) {
-        Optional<User> user = userRepository.findById(userId);
-           if (!user.isPresent()) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+           if (!optionalUser.isPresent()) {
                 return Response.createFailureResponse(String.format("User with id: %d does not exist", userId));
             }
-           if( PermissionsManager.hasPermission(user.get().getUserType(),action))
+           User user = optionalUser.get();
+           if( PermissionsManager.hasPermission(user.getUserType(),action)) {
+               if(action==UserActions.SendMainRoomMessage)
+               {
+                   if(user.getMessageAbility()== MessageAbility.MUTED)
+                       return Response.createSuccessfulResponse(false);
+               }
                return Response.createSuccessfulResponse(true);
+
+           }
            return Response.createSuccessfulResponse(false);
     }
 }
