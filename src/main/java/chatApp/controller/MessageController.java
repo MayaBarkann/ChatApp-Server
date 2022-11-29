@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @CrossOrigin
 @RestController
@@ -108,15 +109,26 @@ public class MessageController {
         return ResponseEntity.badRequest().body(null);
     }
 
+    /**
+     *
+     * @param userId
+     * @return
+     */
     @GetMapping("/channel/get-all-private-messages")
-    public ResponseEntity<Map<String, List<Message>>> getAllPrivateMessagesByUserId(@RequestParam int userId){
+    public ResponseEntity<Map<String, List<OutputMessage>>> getAllPrivateMessagesByUserId(@RequestParam int userId){
         Response<Boolean> response = permissionService.checkPermission(userId, UserActions.ReceivePersonalMessage);
         if(response.isSucceed())
         {
             if(response.getData()) {
                 Map<Integer, List<Message>> sortedChannelMessagesById = messageService.getAllPrivateMessagesByUserIdSortedByTime(userId);
-                Map<String, List<Message>> sortedChannelMessagesByUserName = new HashMap<>();
-                sortedChannelMessagesById.forEach((k,v) -> sortedChannelMessagesByUserName.put(userService.getUserNameById(k), v));
+                Map<String, List<OutputMessage>> sortedChannelMessagesByUserName = new HashMap<>();
+                //todo; change this to be more readable
+
+                // maps the user id (key) to its user name and converts each message in the lists (value) to output message .
+                sortedChannelMessagesById.forEach(
+                        (k,v) -> sortedChannelMessagesByUserName.put(userService.getUserNameById(k),
+                                v.stream().map(m -> OutputMessage.createPrivateMessage(
+                                        m, userService.getUserNameById(m.getSenderId()), userService.getUserNameById(m.getReceiverId()))).collect(Collectors.toList())));
 
                 return ResponseEntity.ok(sortedChannelMessagesByUserName);
             }
