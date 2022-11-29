@@ -92,7 +92,7 @@ public class EmailSender {
             email.addRecipient(javax.mail.Message.RecipientType.TO, new InternetAddress(destination));
             email.setSubject(subject);
             email.setText(msg);
-        } catch (MessagingException e) {
+        } catch (Exception e) {
             return Response.createFailureResponse("Failed to create email message." + e);
         }
 
