@@ -18,12 +18,8 @@ public class AppConfig {
     public AppConfig(AuthService authService) {
         System.out.println("AppConfig is created");
         this.authService = authService;
-
-    }/*
-=======
     }
     /*
->>>>>>> master
     @Bean
     public FilterRegistrationBean<LoginFilter> loginFilterBean() {
         FilterRegistrationBean <LoginFilter> registrationBean = new FilterRegistrationBean<>();
@@ -42,13 +38,24 @@ public class AppConfig {
     *
     */
     @Bean
+    public FilterRegistrationBean<CorsFilter> corsFilterBean() {
+        logger.info("CorsFilterBean has been created");
+        FilterRegistrationBean <CorsFilter> registrationBean = new FilterRegistrationBean<>();
+        CorsFilter corsFilter= new CorsFilter();
+        registrationBean.setFilter(corsFilter);
+        registrationBean.addUrlPatterns("/*");
+        registrationBean.setOrder(1); //set precedence
+        return registrationBean;
+    }
+
+    @Bean
     public FilterRegistrationBean<TokenFilter> filterRegistrationBean() {
         logger.info("FilterRegistrationBean has been created");
         FilterRegistrationBean <TokenFilter> registrationBean = new FilterRegistrationBean<>();
         TokenFilter customURLFilter = new TokenFilter(authService);
         registrationBean.setFilter(customURLFilter);
         registrationBean.addUrlPatterns("/auth/*");
-        registrationBean.setOrder(1); //set precedence
+        registrationBean.setOrder(2); //set precedence
         return registrationBean;
     }
 }

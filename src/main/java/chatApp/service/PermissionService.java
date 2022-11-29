@@ -24,7 +24,7 @@ public class PermissionService {
                if(action==UserActions.SendMainRoomMessage)
                {
                    if(user.getMessageAbility()== MessageAbility.MUTED)
-                       return Response.createFailureResponse("You are muted.");
+                       return Response.createSuccessfulResponse(false);
                }
                return Response.createSuccessfulResponse(true);
 

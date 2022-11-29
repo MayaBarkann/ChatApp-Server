@@ -14,15 +14,13 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = SpringApp.class)
-@EnableAspectJAutoProxy
 public class UserControllerTests {
-    public static final Logger logger = LogManager.getLogger(ControllerUtil.class);
+    private static final Logger logger = LogManager.getLogger(ControllerUtil.class);
     @Autowired
     private UserController userController;
     @Autowired
