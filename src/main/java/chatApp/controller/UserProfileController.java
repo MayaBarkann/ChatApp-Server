@@ -14,7 +14,7 @@ import chatApp.entities.User;
 
 @RestController
 @CrossOrigin
-@RequestMapping("Auth/profile")
+@RequestMapping("auth/profile")
 public class UserProfileController {
 
     @Autowired
