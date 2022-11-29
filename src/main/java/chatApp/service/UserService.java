@@ -22,26 +22,24 @@ public class UserService {
     /**
      * Checks if user email and username are not null or empty, and aren't already taken by other users.
      *
-     * @param user User object, contains data to be validated.
-     * @return Response<User> object, if user data is valid returns the user object, if user data is invalid returns error message.
+     * @param email String, inputted email to be checked.
+     * @param username String, inputted username to be checked.
+     * @return Response<String> object, if user input is valid returns the email, if user input is invalid returns error message.
      */
-    private Response<User> validateUserInput(User user){
-        if (user == null) {
-            return Response.createFailureResponse("User can't be null");
-        }
-        if (user.getEmail() == null || user.getEmail().isEmpty()) {
+    public Response<String> validateUserInput(String email, String username){
+        if (email == null || email.isEmpty()) {
             return Response.createFailureResponse("Email can't be null or empty.");
         }
-        if (user.getUsername() == null || user.getUsername().isEmpty()) {
+        if (username == null || username.isEmpty()) {
             return Response.createFailureResponse("Username can't be null or empty.");
         }
-        if (userRepository.findByEmail(user.getEmail()) != null) {
-            return Response.createFailureResponse(String.format("Email %s exists in users table", user.getEmail()));
+        if (userRepository.findByEmail(email) != null) {
+            return Response.createFailureResponse(String.format("Email %s exists in users table", email));
         }
-        if (userRepository.findByUsername(user.getUsername()) != null) {
-            return Response.createFailureResponse(String.format("Username %s exists in users table", user.getUsername()));
+        if (userRepository.findByUsername(username) != null) {
+            return Response.createFailureResponse(String.format("Username %s exists in users table", username));
         }
-        return Response.createSuccessfulResponse(user);
+        return Response.createSuccessfulResponse(email);
     }
 
     /**
@@ -53,18 +51,18 @@ public class UserService {
      * @return a Response, contains: if action succeeded - data=saved user, isSucceeded=true, message=null; if action failed - data = null. isSucceeded = false, message=reason for failure
      */
     public Response<User> addUser(String email,String password,String username) {
-        User newUser = new User(username,email,password);
-        Response<User> response = validateUserInput(newUser);
+        Response<String> response = validateUserInput(email,username);
         if(!response.isSucceed()){
             return Response.createFailureResponse(response.getMessage());
         }
+        User newUser = new User(username,email,password);
         newUser.setPassword(ServiceUtil.encryptPassword(newUser.getPassword()));
         newUser.setUserType(UserType.NOT_ACTIVATED);
         newUser.setUserStatus(UserStatus.OFFLINE);
         newUser.setMessageAbility(MessageAbility.UNMUTED);
         newUser.setRegisterDateTime(LocalDateTime.now());
-        userRepository.save(newUser);
-        return Response.createSuccessfulResponse(newUser);
+        User user = userRepository.save(newUser);
+        return Response.createSuccessfulResponse(user);
     }
 
     /**
@@ -81,40 +79,38 @@ public class UserService {
         return Response.createFailureResponse("User with id: " + id + "not found");
     }
 
-    private User getUserById(int id){
-        return userRepository.findById(id).orElse(null);
-    }
-
-    private void updateUser(User user){
-        userRepository.save(user);
-    }
-
     /**
-     * toggles the message ability (mute or unmute)
+     * Toggles the message ability of the user(mute or unmute).
+     *
      * @param id - id of user we want to toggle
      * @return Successful response if the user exists and toggling operation succeeded,
-     * returns failure response if the user does not exists.
+     * returns failure response if the user does not exist.
      */
     public Response<User> toggleMessageAbility(int id){
-        User user = getUserById(id);
-
-        if(user == null){
-            return Response.createFailureResponse("user does not exists");
+        Response<User> responseUser = findUserById(id);
+        if(!responseUser.isSucceed() || responseUser.getData()==null){
+            return Response.createFailureResponse("user does not exist.");
         }
+        User user = responseUser.getData();
         user.toggleMessageAbility();
-        updateUser(user);
-
+        userRepository.save(user);
         return Response.createSuccessfulResponse(user);
     }
 
 
+    /**
+     * Changes user status from online to away, or from away to online.
+     *
+     * @param id - int, id of user whose status we want to change.
+     * @return Successful response if the user exists and change status operation succeeded,
+     * returns failure response if the user does not exist or user is offline.
+     */
     public Response<User> changeStatus(int id){
-        User user = getUserById(id);
-
-        if(user == null){
-            return Response.createFailureResponse("user does not exists");
+        Response<User> responseUser = findUserById(id);
+        if(!responseUser.isSucceed() || responseUser.getData()==null){
+            return Response.createFailureResponse("user does not exist.");
         }
-
+        User user = responseUser.getData();
         if(user.getUserStatus() == UserStatus.ONLINE){
             user.setUserStatus(UserStatus.AWAY);
         } else if(user.getUserStatus() == UserStatus.AWAY){
@@ -122,11 +118,8 @@ public class UserService {
         } else {
             return Response.createFailureResponse("can not change status to user");
         }
-
-        updateUser(user);
+        userRepository.save(user);
         return Response.createSuccessfulResponse(user);
-
-
     }
 
     /**
@@ -139,8 +132,9 @@ public class UserService {
     }
 
     /**
+     * Finds and returns a list of all the Registered and Admin users.
      *
-     * @return all registered users
+     * @return List<User>, a list of all the registered users.
      */
     public List<User> getAllRegisteredUser(){
         return userRepository.findAll().stream().filter(

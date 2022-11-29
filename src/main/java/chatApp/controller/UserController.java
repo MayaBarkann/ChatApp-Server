@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,6 +34,9 @@ public class UserController {
      */
     @RequestMapping(method = RequestMethod.POST, value = "/register")
     public ResponseEntity<String> createUser(@RequestBody UserRegister userRegister) {
+        if(userRegister==null){
+            return ResponseEntity.badRequest().body("Error during user register. Reason: " + "registered user can't be null.");
+        }
         Response<String> isValidResponse = ControllerUtil.validateUserCredentials(userRegister.getEmail(),userRegister.getPassword());
         if(!isValidResponse.isSucceed()){
             return ResponseEntity.badRequest().body("Error during user register. Reason: " + isValidResponse.getMessage());
@@ -68,25 +70,6 @@ public class UserController {
             return ResponseEntity.ok("Account with email" + response.getData() + " was activated successfully.");
         }
         return ResponseEntity.badRequest().body(response.getMessage());
-    }
-
-    /**
-     * Sends an activation email to the given email address, if it exists in database and user isn't already active.
-     *
-     * @param email String email address to where the activation email will be sent.
-     * @return Response object, if action successful - contains the destination email, if action failed - contains the error message.
-     */
-    @RequestMapping(method = RequestMethod.POST, value = "/resendActivationEmail")
-    public ResponseEntity<String> resendActivationEmail(@RequestBody String email) {
-        Response<String> validateEmailResponse = ControllerUtil.isEmailValid(email);
-        if(!validateEmailResponse.isSucceed()){
-            return ResponseEntity.badRequest().body("Error during resending activation email to address: " + email + ". Reason: " + validateEmailResponse.getMessage());
-        }
-        Response<String> responseResendEmail = userActivationService.sendActivationEmail(email);
-        if (!responseResendEmail.isSucceed()) {
-            return ResponseEntity.badRequest().body("Error during resending activation email to address: " + email + ". " + responseResendEmail.getMessage());
-        }
-        return ResponseEntity.ok("Activation email resent successfully to: " + email);
     }
 
     /**
