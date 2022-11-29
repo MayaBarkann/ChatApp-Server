@@ -62,6 +62,8 @@ public class AuthController {
      * @param authToken String, user's authentication token.
      * @return ResponseEntity<String>, if action succeeded - holds logged-out user's username, otherwise - error message.
      */
+
+    //todo: chnage this so it will receive @RequestAttribute("userId")
     @RequestMapping(value = "auth/logout" ,method = RequestMethod.GET)
     public ResponseEntity<String> userLogout(@RequestHeader("token") String authToken) {
         if(!ServiceUtil.isTokenFormatValid(authToken)){

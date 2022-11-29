@@ -30,6 +30,7 @@ public class UserProfileController {
      * @param userProfile new user profile with the values we want to edit and the values we want to keep
      * @return response entity with status 200 if the user profile was updated successfully
      */
+    //todo: change- add @RequestAttribute("userId") int userId
     @PutMapping("/edit")
     //public ResponseEntity<String> editUserProfile(@RequestBody UserProfileToPresent userProfileToPresent, @RequestParam("path") String localImagePath, @RequestParam("id") int id){
     public ResponseEntity<String> editUserProfile(@RequestBody UserProfile userProfile){
@@ -63,7 +64,7 @@ public class UserProfileController {
      * @return response with the user profile if it has the permissions for it, if not return failure response with the right message
      */
     @GetMapping("/load")
-    public ResponseEntity<UserProfileToPresent> getUserProfileById(@RequestParam("id") int userId, @RequestParam("id_of_user_profile_to_view") int userIdToView){
+    public ResponseEntity<UserProfileToPresent> getUserProfileById(@RequestAttribute("userId") int userId, @RequestParam("id_of_user_profile_to_view") int userIdToView){
         Response<Boolean> responseRequestUserHasPermissionsToViewProfile = permissionService.checkPermission(userId, UserActions.ViewProfile);
         Response<Boolean> responseUserToViewHasProfile = permissionService.checkPermission(userId, UserActions.HasProfile);
 
