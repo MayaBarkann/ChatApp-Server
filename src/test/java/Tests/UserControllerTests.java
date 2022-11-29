@@ -5,7 +5,6 @@ import chatApp.controller.UserController;
 import chatApp.controller.entities.UserRegister;
 import chatApp.repository.UserRepository;
 import chatApp.service.UserService;
-import org.aspectj.lang.annotation.Aspect;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
@@ -18,7 +17,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = SpringApp.class)
 @EnableAspectJAutoProxy
-@Aspect
 public class UserControllerTests {
     @Autowired
     private UserController userController;
@@ -29,12 +27,11 @@ public class UserControllerTests {
 
 
     @Test
-
     public void testValidSyntaxUserInsert() {
 
         //user with null email.
         UserRegister userRegisterInput = new UserRegister(null, "password", "username");
-        System.out.println(userController.createUser(userRegisterInput).getStatusCode());
+
         Assertions.assertTrue(checkStatus(userController.createUser(userRegisterInput),400),"user with null email should return bad request.");
        //user with empty email.
         userRegisterInput.setEmail("");
