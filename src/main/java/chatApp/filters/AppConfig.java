@@ -13,12 +13,17 @@ import org.springframework.context.annotation.Configuration;
 public class AppConfig {
     public static final Logger logger = LogManager.getLogger(AppConfig.class);
     private final AuthService authService;
+
     @Autowired
     public AppConfig(AuthService authService) {
         System.out.println("AppConfig is created");
         this.authService = authService;
+
+    }/*
+=======
     }
     /*
+>>>>>>> master
     @Bean
     public FilterRegistrationBean<LoginFilter> loginFilterBean() {
         FilterRegistrationBean <LoginFilter> registrationBean = new FilterRegistrationBean<>();

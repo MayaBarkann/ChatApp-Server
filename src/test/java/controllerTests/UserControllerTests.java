@@ -1,4 +1,4 @@
-package Tests;
+package controllerTests;
 
 import chatApp.SpringApp;
 import chatApp.controller.UserController;
