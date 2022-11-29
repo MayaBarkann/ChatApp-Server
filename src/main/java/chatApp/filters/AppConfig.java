@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Configuration;
 public class AppConfig {
     public static final Logger logger = LogManager.getLogger(AppConfig.class);
     private final AuthService authService;
+
     @Autowired
     public AppConfig(AuthService authService) {
         System.out.println("AppConfig is created");
@@ -37,13 +38,24 @@ public class AppConfig {
     *
     */
     @Bean
+    public FilterRegistrationBean<CorsFilter> corsFilterBean() {
+        logger.info("CorsFilterBean has been created");
+        FilterRegistrationBean <CorsFilter> registrationBean = new FilterRegistrationBean<>();
+        CorsFilter corsFilter= new CorsFilter();
+        registrationBean.setFilter(corsFilter);
+        registrationBean.addUrlPatterns("/*");
+        registrationBean.setOrder(1); //set precedence
+        return registrationBean;
+    }
+
+    @Bean
     public FilterRegistrationBean<TokenFilter> filterRegistrationBean() {
         logger.info("FilterRegistrationBean has been created");
         FilterRegistrationBean <TokenFilter> registrationBean = new FilterRegistrationBean<>();
         TokenFilter customURLFilter = new TokenFilter(authService);
         registrationBean.setFilter(customURLFilter);
         registrationBean.addUrlPatterns("/auth/*");
-        registrationBean.setOrder(1); //set precedence
+        registrationBean.setOrder(2); //set precedence
         return registrationBean;
     }
 }

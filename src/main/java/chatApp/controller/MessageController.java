@@ -53,7 +53,7 @@ public class MessageController {
             }
             return ResponseEntity.status(401).body("You don't have permission to send a message to the main room.");
         }
-        return ResponseEntity.badRequest().body("user not found.");
+        return ResponseEntity.badRequest().body(response.getMessage());
     }
     @GetMapping("/MainRoom/Get")
     public ResponseEntity<List<Message>> getAllMainRoomMessages(@RequestParam int userID,@RequestParam(required = false) LocalDateTime start,@RequestParam(required = false) LocalDateTime end)
