@@ -140,4 +140,12 @@ public class UserService {
         return userRepository.findAll().stream().filter(
                 user->user.getUserType().equals(UserType.REGISTERED) || user.getUserType().equals(UserType.ADMIN)).collect(Collectors.toList());
     }
+
+    public String getUserNameById(int userId){
+        User user = getUserById(userId);
+        if ( user != null) {
+            return user.getUsername();
+        }
+        return null;
+    }
 }

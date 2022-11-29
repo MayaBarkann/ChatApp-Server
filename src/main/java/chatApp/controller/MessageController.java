@@ -16,8 +16,11 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @CrossOrigin
 @RestController
@@ -37,7 +40,7 @@ public class MessageController {
     }
 
     @PostMapping("/MainRoom/Send")
-    public ResponseEntity<String> sendPublicMessage(@RequestBody String message,@RequestHeader(HttpHeaders.FROM) int senderId)
+    public ResponseEntity<String> sendPublicMessage(@RequestBody String message, @RequestAttribute("userId") int senderId)
     {
         Response<Boolean> response = permissionService.checkPermission(senderId, UserActions.SendMainRoomMessage);
         if(response.isSucceed())
@@ -53,7 +56,7 @@ public class MessageController {
         return ResponseEntity.badRequest().body(response.getMessage());
     }
     @GetMapping("/MainRoom/Get")
-    public ResponseEntity<List<Message>> getAllMainRoomMessages(@RequestParam int userID,@RequestParam(required = false) LocalDateTime start,@RequestParam(required = false) LocalDateTime end)
+    public ResponseEntity<List<Message>> getAllMainRoomMessages(@RequestAttribute("userId") int userID, @RequestParam(required = false) LocalDateTime start, @RequestParam(required = false) LocalDateTime end)
     {
         Response<Boolean> response = permissionService.checkPermission(userID, UserActions.ReceiveMainRoomMessage);
         if(response.isSucceed())
@@ -66,7 +69,7 @@ public class MessageController {
         return ResponseEntity.badRequest().body(null);
     }
     @PostMapping("/channel/send")
-    public ResponseEntity<String> sendPersonalMessage(@RequestParam int senderId,@RequestParam int reciverID,@RequestBody String message)
+    public ResponseEntity<String> sendPersonalMessage(@RequestAttribute("userId") int senderId, @RequestParam int reciverID, @RequestBody String message)
     {
         Response<Boolean> response = permissionService.checkPermission(senderId, UserActions.SendPersonalMessage);
         Response<Boolean> response2 = permissionService.checkPermission(reciverID, UserActions.ReceivePersonalMessage);
@@ -85,15 +88,17 @@ public class MessageController {
        if(!response.isSucceed()) return ResponseEntity.badRequest().body("sender not found.");
        return ResponseEntity.badRequest().body("reciver not found.");
     }
+
+    //todo: change reciver id to string user name and also the return value to be output messages
     @GetMapping("/channel/get")
-    public ResponseEntity<List<Message>> getPersonalMessages(@RequestParam int senderId,@RequestParam int reciverId)
+    public ResponseEntity<List<Message>> getPersonalMessages(@RequestAttribute("userId") int senderId, @RequestParam int reciverId)
     {
         List<Message> result;
         result=messageService.getChannelMessages(senderId,reciverId);
         return  ResponseEntity.ok(result);
     }
     @GetMapping("/channel/getAll")
-    public ResponseEntity<List<Message>> getAllUserChannels(@RequestParam int userId)
+    public ResponseEntity<List<Message>> getAllUserChannels(@RequestAttribute("userId") int userId)
     {
         Response<Boolean> response = permissionService.checkPermission(userId, UserActions.ReceivePersonalMessage);
         if(response.isSucceed())
@@ -104,6 +109,38 @@ public class MessageController {
             return ResponseEntity.status(401).body(null);
         }
         return ResponseEntity.badRequest().body(null);
+    }
+
+    /**
+     *
+     * @param
+     * @return
+     */
+    @GetMapping("/channel/get-all-private-messages")
+    public ResponseEntity<Map<String, List<OutputMessage>>> getAllPrivateMessagesByUserId(@RequestAttribute("userId") int userId){
+        //@RequestHeader Map<String,String> headers
+        //int userId = Integer.parseInt(headers.get("userId"));
+        //int userId =
+        Response<Boolean> response = permissionService.checkPermission(userId, UserActions.ReceivePersonalMessage);
+        if(response.isSucceed())
+        {
+            if(response.getData()) {
+                Map<Integer, List<Message>> sortedChannelMessagesById = messageService.getAllPrivateMessagesByUserIdSortedByTime(userId);
+                Map<String, List<OutputMessage>> sortedChannelMessagesByUserName = new HashMap<>();
+                //todo; change this to be more readable
+
+                // maps the user id (key) to its user name and converts each message in the lists (value) to output message .
+                sortedChannelMessagesById.forEach(
+                        (k,v) -> sortedChannelMessagesByUserName.put(userService.getUserNameById(k),
+                                v.stream().map(m -> OutputMessage.createPrivateMessage(
+                                        m, userService.getUserNameById(m.getSenderId()), userService.getUserNameById(m.getReceiverId()))).collect(Collectors.toList())));
+
+                return ResponseEntity.ok(sortedChannelMessagesByUserName);
+            }
+            return ResponseEntity.status(401).body(null);
+        }
+        return ResponseEntity.badRequest().body(null);
+
     }
 
 }

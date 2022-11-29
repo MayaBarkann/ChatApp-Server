@@ -28,6 +28,7 @@ public class TokenFilter implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         logger.info("Auth filter is working on the following request: " + servletRequest);
+        //ServletRequest servletRequestWithParameter = (HttpServletRequest) servletRequest.;
         MutableHttpServletRequest req =new MutableHttpServletRequest ((HttpServletRequest) servletRequest);
         HttpServletResponse res = (HttpServletResponse) servletResponse;
         String authToken = req.getHeader("Authorization");
@@ -35,7 +36,8 @@ public class TokenFilter implements Filter {
             Response<Integer> tokenCorrect = authService.isTokenCorrect(authToken);
             if(tokenCorrect.isSucceed())
             {
-               req.addHeader("userId", tokenCorrect.getData().toString());
+               //req.addHeader("userId", tokenCorrect.getData().toString());
+                req.setAttribute("userId", tokenCorrect.getData());
                filterChain.doFilter(req,res);
             }
             else returnBadResponse(res);
