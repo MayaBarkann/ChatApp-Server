@@ -126,7 +126,7 @@ public class MessageControllerTest {
         ResponseEntity<String> response = messageController.sendPublicMessage(messageContent, user.getId());
         logger.info("user id: " +user.getId()+ " user type: "+user.getUserType() + " isMuted: "+user.getMessageAbility());
         logger.info("response: " + response);
-        Assertions.assertEquals(messageRepo.findBySenderId(user.getId()).stream().findFirst().orElseThrow().getContent(), messageContent,"There is a problem with message repository. Message was not saved.");
+        Assertions.assertEquals(messageRepo.findBySenderId(user.getId()).stream().findFirst().get().getContent(), messageContent,"There is a problem with message repository. Message was not saved.");
         Assertions.assertEquals(response.getStatusCode().value(),200,"User should be able to send public message.");
         Assertions.assertEquals(response.getBody(), "The message was sent successfully.");
         messageRepo.deleteAll(messageRepo.findBySenderId(user.getId()));
