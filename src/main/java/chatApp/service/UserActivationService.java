@@ -112,9 +112,9 @@ public class UserActivationService {
      * Turns user's userType from NOT_ACTIVATED to REGISTERED in the database, if the activation token is valid.
      *
      * @param activationToken the token used for verifying if the account can undergo the activation process.
-     * @return Response<User> object, contains: if action successful - data=activated user data, isSucceed=true, message=null; if action failed - data=null, isSucceed=false, message=reason for failure.
+     * @return Response<String> object, contains: if action successful - data=activated user's email, isSucceed=true, message=null; if action failed - data=null, isSucceed=false, message=reason for failure.
      */
-    public Response<User> activateUser(String activationToken) {
+    public Response<String> activateUser(String activationToken) {
         Response<String> responseTokenValidate = validateActivationToken(activationToken);
         if(!responseTokenValidate.isSucceed()) {
             return Response.createFailureResponse(responseTokenValidate.getMessage());
@@ -126,7 +126,7 @@ public class UserActivationService {
         if(!responseProfileCreate.isSucceed()){
             return responseProfileCreate;
         }
-        return Response.createSuccessfulResponse(user);
+        return Response.createSuccessfulResponse(user.getEmail());
     }
 
     /**

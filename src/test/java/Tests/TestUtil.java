@@ -1,8 +1,0 @@
-package Tests;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-public class TestUtil {
-    public static final Logger logger = LogManager.getLogger(TestUtil.class);
-}
