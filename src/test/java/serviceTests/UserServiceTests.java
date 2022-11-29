@@ -133,7 +133,8 @@ public class UserServiceTests {
 
     @Test
     public void toggleMessageAbility_userNotExists_returnsFailureResponse(){
-        User user = userService.addUser(email,password,username).getData();
+        userService.addUser(email,password,username);
+        User user = userRepository.findByEmail(email);
         userRepository.deleteById(user.getId());
 
         userResponse = userService.toggleMessageAbility(user.getId());
@@ -176,12 +177,13 @@ public class UserServiceTests {
         userResponse = userService.changeStatus(user.getId());
         Optional<User> checkUser = userRepository.findById(user.getId());
         assertEquals(checkUser.get().getUserStatus(), UserStatus.OFFLINE, "User status is OFFLINE but statusChange action change the status.");
-        assertTrue(userResponse.isSucceed(), "Offline User status can't be changed, but action didn't return failure response.");
+        assertTrue(!userResponse.isSucceed(), "Offline User status can't be changed, but action didn't return failure response.");
     }
 
     @Test
     public void changeStatus_userNotExists_returnsFailureResponse(){
-        User user = userService.addUser(email,password,username).getData();
+        userService.addUser(email,password,username);
+        User user = userRepository.findByEmail(email);
         userRepository.deleteById(user.getId());
 
         userResponse = userService.changeStatus(user.getId());

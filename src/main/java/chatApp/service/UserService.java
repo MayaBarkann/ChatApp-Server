@@ -86,17 +86,35 @@ public class UserService {
      * @return Successful response if the user exists and toggling operation succeeded,
      * returns failure response if the user does not exist.
      */
-    public Response<User> toggleMessageAbility(int id){
-        Response<User> responseUser = findUserById(id);
-        if(!responseUser.isSucceed() || responseUser.getData()==null){
-            return Response.createFailureResponse("user does not exist.");
-        }
-        User user = responseUser.getData();
-        user.toggleMessageAbility();
-        userRepository.save(user);
-        return Response.createSuccessfulResponse(user);
+    private User getUserById(int id){
+        return userRepository.findById(id).orElse(null);
     }
 
+    /**
+     *
+     * @param user Object contains user data that needs to be updated.
+     */
+    private void updateUser(User user){
+        userRepository.save(user);
+    }
+
+    /**
+     * toggles the message ability (mute or unmute)
+     * @param id - id of user we want to toggle
+     * @return Successful response if the user exists and toggling operation succeeded,
+     * returns failure response if the user does not exist.
+     */
+    public Response<User> toggleMessageAbility(int id){
+        User user = getUserById(id);
+
+        if(user == null){
+            return Response.createFailureResponse("user does not exists");
+        }
+        user.toggleMessageAbility();
+        updateUser(user);
+
+        return Response.createSuccessfulResponse(user);
+    }
 
     /**
      * Changes user status from online to away, or from away to online.
@@ -106,11 +124,10 @@ public class UserService {
      * returns failure response if the user does not exist or user is offline.
      */
     public Response<User> changeStatus(int id){
-        Response<User> responseUser = findUserById(id);
-        if(!responseUser.isSucceed() || responseUser.getData()==null){
-            return Response.createFailureResponse("user does not exist.");
+        User user = getUserById(id);
+        if(user == null){
+            return Response.createFailureResponse("user does not exists");
         }
-        User user = responseUser.getData();
         if(user.getUserStatus() == UserStatus.ONLINE){
             user.setUserStatus(UserStatus.AWAY);
         } else if(user.getUserStatus() == UserStatus.AWAY){
@@ -118,7 +135,7 @@ public class UserService {
         } else {
             return Response.createFailureResponse("can not change status to user");
         }
-        userRepository.save(user);
+        updateUser(user);
         return Response.createSuccessfulResponse(user);
     }
 
