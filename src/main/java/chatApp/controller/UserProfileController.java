@@ -25,46 +25,51 @@ public class UserProfileController {
     private PermissionService permissionService;
 
     /***
-     * Edit user profile by users id.
-     * Checks if the user has the permission to do so and if so - updates the user profile.
-     * @param userProfile new user profile with the values we want to edit and the values we want to keep
+     * Edit user profile by user id.
+     * Checks if the user has the permission to do so and if so - updates the user profile according to the values given in userProfileToPresent.
+     * @param userProfileToPresent new user profile with the values we want to edit and the values we want to keep
+     * @param userId user id of the user we are editing his profile
      * @return response entity with status 200 if the user profile was updated successfully
      */
-    //todo: change- add @RequestAttribute("userId") int userId
     @PutMapping("/edit")
-    //public ResponseEntity<String> editUserProfile(@RequestBody UserProfileToPresent userProfileToPresent, @RequestParam("path") String localImagePath, @RequestParam("id") int id){
-    public ResponseEntity<String> editUserProfile(@RequestBody UserProfile userProfile){
+    public ResponseEntity<UserProfileToPresent> editUserProfile(@RequestAttribute("userId") int userId , @RequestBody UserProfileToPresent userProfileToPresent){
 
-        if(userProfile == null){
-            return ResponseEntity.badRequest().body("user not found.");
+        if(userProfileToPresent == null){
+            return ResponseEntity.badRequest().body(null);
         }
-        Response<Boolean> response = permissionService.checkPermission(userProfile.getId(), UserActions.HasProfile);
+        Response<Boolean> response = permissionService.checkPermission(userId, UserActions.HasProfile);
         if (!response.isSucceed()){
-            return ResponseEntity.badRequest().body("user not found.");
+            return ResponseEntity.badRequest().body(null);
 
         } else if(!response.getData()){
-            return ResponseEntity.status(401).body("this type of user does not have permissions to edit profile.");
+            return ResponseEntity.status(401).body(null);
 
         }
 
-        Response<UserProfile> responseEdit = userProfileService.editUserProfile(userProfile);
+        UserProfile oldUserProfile = userProfileService.getUserProfileById(userId).getData();
+        UserProfile newUserProfile = UserProfile.createUserProfileFromIdAndUserProfileToPresent(userId, userProfileToPresent);
+        Response<UserProfile> responseEdit = userProfileService.editUserProfile(newUserProfile);
 
         if(!responseEdit.isSucceed()){
-            return ResponseEntity.status(401).body(responseEdit.getMessage());
+            return ResponseEntity.status(401).body(null);
         }
 
-        return ResponseEntity.ok("profile edited successfully");
+        return ResponseEntity.ok(UserProfileToPresent.createFromUserProfileAndUser(responseEdit.getData(), userService.findUserById(userId).getData()));
     }
 
     /***
      * load user profile by user id. The method checks if the requesting user exists and has permissions to view profile
      * and checks if the profile we want to view exists and public by calling to permission manager.
      * @param userId - the user id of the user requesting to view profile
-     * @param userIdToView - the id of the profile we want to view
+     * @param usernameToView - username of the user we want to view his profile
      * @return response with the user profile if it has the permissions for it, if not return failure response with the right message
      */
     @GetMapping("/load")
-    public ResponseEntity<UserProfileToPresent> getUserProfileById(@RequestAttribute("userId") int userId, @RequestParam("id_of_user_profile_to_view") int userIdToView){
+    public ResponseEntity<UserProfileToPresent> getUserProfileByUsername(@RequestAttribute("userId") int userId, @RequestParam("id_of_user_profile_to_view") String usernameToView){
+        Integer userIdToView = userService.getUserIdByUserName(usernameToView);
+        if (userIdToView == null){
+            return ResponseEntity.badRequest().body(null);
+        }
         Response<Boolean> responseRequestUserHasPermissionsToViewProfile = permissionService.checkPermission(userId, UserActions.ViewProfile);
         Response<Boolean> responseUserToViewHasProfile = permissionService.checkPermission(userId, UserActions.HasProfile);
 
@@ -86,4 +91,32 @@ public class UserProfileController {
 
         return ResponseEntity.badRequest().body(null);
     }
+
+    /***
+     * return self user profile by user id if the user has profile and the permissions to view profile
+     * @param userId
+     * @return response entity with the user profile to present
+     */
+    @GetMapping("/loadSelf")
+    public ResponseEntity<UserProfileToPresent> getSelfUserProfileById(@RequestAttribute("userId") int userId){
+        Response<Boolean> responseRequestUserHasPermissionsToViewProfile = permissionService.checkPermission(userId, UserActions.ViewProfile);
+        Response<Boolean> responseUserToViewHasProfile = permissionService.checkPermission(userId, UserActions.HasProfile);
+
+        if(responseRequestUserHasPermissionsToViewProfile.isSucceed() && responseUserToViewHasProfile.isSucceed()){
+
+            if(responseRequestUserHasPermissionsToViewProfile.getData() && responseUserToViewHasProfile.getData()){
+                Response<UserProfile> responseViewProfile = userProfileService.getUserProfileById(userId);
+                Response<User> responseViewUser = userService.findUserById(userId);
+
+                return ResponseEntity.ok(UserProfileToPresent.createFromUserProfileAndUser(responseViewProfile.getData(),
+                        responseViewUser.getData()));
+            }
+
+            return ResponseEntity.status(401).body(null);
+        }
+
+        return ResponseEntity.badRequest().body(null);
+    }
+
+
 }
