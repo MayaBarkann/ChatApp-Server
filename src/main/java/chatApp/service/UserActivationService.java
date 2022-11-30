@@ -19,10 +19,9 @@ public class UserActivationService {
     private UserRepository userRepository;
     @Autowired
     private UserProfileRepository userProfileRepository;
-    private final EmailSender emailSender;
 
     public UserActivationService(){
-        this.emailSender = new EmailSender();
+
     }
 
     /**
@@ -43,9 +42,15 @@ public class UserActivationService {
      * @return Decoded String
      */
     private Map<String,String> decodeToken(String encodedToken){
+        if(encodedToken==null){
+            return new HashMap<>();
+        }
         byte[] decodedBytes = Base64.getDecoder().decode(encodedToken);
         String decodedString = new String(decodedBytes);
         String[] decodedParts = decodedString.split("#");
+        if(decodedParts.length<2){
+            return new HashMap<>();
+        }
         Map<String,String> partsMap = new HashMap<>();
         partsMap.put("email",decodedParts[0]);
         partsMap.put("date",decodedParts[1]);
@@ -76,8 +81,11 @@ public class UserActivationService {
      * @return Response<String></String>, if action was successful - contains the user's email, if action failed - contains the failure message.
      */
     private Response<String> validateActivationToken(String activationToken){
+        if (activationToken == null || activationToken==""){
+            return Response.createFailureResponse(String.format("Activation token can't be null or empty"));
+        }
         Map<String,String> decodedParts = decodeToken(activationToken);
-        if (activationToken == null || decodedParts.get("email")==null || decodedParts.get("date")==null) {
+        if (decodedParts.get("email")==null || decodedParts.get("date")==null) {
             return Response.createFailureResponse(String.format("Invalid activation token"));
         }
         Response<String> response = canUserBeActivated(decodedParts.get("email"));
@@ -85,6 +93,10 @@ public class UserActivationService {
             return response;
         }
         if (LocalDateTime.parse(decodedParts.get("date")).isBefore(LocalDateTime.now())) {
+            User userToDelete = userRepository.findByEmail(decodedParts.get("email"));
+            if(userToDelete!=null){
+                userRepository.deleteById(userToDelete.getId());
+            }
             userRepository.deleteByEmail(decodedParts.get("email"));
             return Response.createFailureResponse(String.format("Activation token expired. Please register again."));
         }
@@ -143,6 +155,7 @@ public class UserActivationService {
         String activationLink="http://localhost:8080/activate/"+this.newActivationToken(toEmail);
         String content = "To activate your ChatApp account, please press the following link: \n" + activationLink +"\n" + "The link will be active for the next 24 hours.";
         String subject = "Activation Email for ChatApp";
+        EmailSender emailSender = new EmailSender();
         Response<String> emailSenderResponse = emailSender.sendMail(subject,content,toEmail);
         if(!emailSenderResponse.isSucceed()){
             return Response.createFailureResponse("Failed to send activation email to: " + toEmail + "." + emailSenderResponse.getMessage());

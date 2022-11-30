@@ -18,7 +18,7 @@ public class PermissionService {
         Optional<User> optionalUser = userRepository.findById(userId);
            if (!optionalUser.isPresent()) {
                 return Response.createFailureResponse(String.format("User with id: %d does not exist", userId));
-            }
+           }
            User user = optionalUser.get();
            if( PermissionsManager.hasPermission(user.getUserType(),action)) {
                if(action==UserActions.SendMainRoomMessage)

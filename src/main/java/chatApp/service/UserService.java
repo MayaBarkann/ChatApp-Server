@@ -3,6 +3,7 @@ package chatApp.service;
 
 import chatApp.entities.*;
 import chatApp.repository.UserRepository;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -54,14 +55,21 @@ public class UserService {
         if(!response.isSucceed()){
             return Response.createFailureResponse(response.getMessage());
         }
+        /*
         User newUser = new User(username,email,password);
         newUser.setPassword(ServiceUtil.encryptPassword(newUser.getPassword()));
         newUser.setUserType(UserType.NOT_ACTIVATED);
         newUser.setUserStatus(UserStatus.OFFLINE);
         newUser.setMessageAbility(MessageAbility.UNMUTED);
         newUser.setRegisterDateTime(LocalDateTime.now());
-        User user = userRepository.save(newUser);
-        return Response.createSuccessfulResponse(user);
+        */
+        User newUser = User.createNotActivatedUser(username,email,ServiceUtil.encryptPassword(password));
+        try {
+            newUser = userRepository.save(newUser);
+        } catch (DataAccessException e) {
+            return Response.createFailureResponse("Error occurred while trying to register user to database.");
+        }
+        return Response.createSuccessfulResponse(newUser);
     }
 
     /**

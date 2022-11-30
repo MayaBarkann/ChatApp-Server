@@ -23,7 +23,6 @@ public class UserServiceAddUserTests {
     private UserService userService;
     @Autowired
     private UserRepository userRepository;
-
     private final String EMAIL = "chat.app3000@gmail.com";
     private final String PASSWORD = "hfghF$ff123";
     private final String USERNAME = "someUsername";

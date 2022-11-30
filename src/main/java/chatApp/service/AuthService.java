@@ -105,13 +105,9 @@ public class AuthService {
         if (temp!=null) {
             return Response.createFailureResponse("Can't join chat: username " + username + " is taken.");
         }
-        String generatedGuestEmail = UUID.randomUUID().toString().replace("-", "") + "@chatapp.guest";
-        User guestUser = new User("Guest-" + username, generatedGuestEmail, null);
-        guestUser.setUserType(UserType.GUEST);
-        guestUser.setUserStatus(UserStatus.ONLINE);
-        guestUser.setMessageAbility(MessageAbility.UNMUTED);
+        User guestUser = User.createGuestUser(username);
         try {
-            userRepository.save(guestUser);
+            guestUser = userRepository.save(guestUser);
         } catch (DataAccessException e) {
             return Response.createFailureResponse("Error occurred while trying to add guest user to database.");
         }

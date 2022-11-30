@@ -11,7 +11,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Optional;
@@ -27,17 +26,11 @@ public class UserServiceTests {
     private UserService userService;
     @Autowired
     private UserRepository userRepository;
-
     private final String EMAIL="some.email@gmail.com";
-
     private final String USERNAME ="someUsername";
-
     private final String PASSWORD ="Password$1";
-
     private final int ID = 111;
-
     private Response<String> response;
-
     private Response<User> userResponse;
 
     private void deleteUserIfExists(String email,String username){

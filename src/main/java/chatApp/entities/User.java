@@ -3,6 +3,7 @@ package chatApp.entities;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 @Table(name = "user")
@@ -24,6 +25,7 @@ public class User {
     private LocalDateTime registerDateTime;
     private LocalDateTime lastLoginDateTime;
 
+
     public User(String username, String email, String password) {
         this.username = username;
         this.email = email;
@@ -32,6 +34,24 @@ public class User {
 
     public User(){
 
+    }
+
+    public static User createGuestUser(String username){
+        User user = new User("Guest-"+username, UUID.randomUUID().toString().replace("-", "") + "@chatapp.guest",null);
+        user.setUserType(UserType.GUEST);
+        user.setMessageAbility(MessageAbility.UNMUTED);
+        user.setUserStatus(UserStatus.ONLINE);
+        user.setLastLoginDateTime(LocalDateTime.now());
+        return user;
+    }
+
+    public static User createNotActivatedUser(String username,String email,String password){
+        User user = new User(username, email,password);
+        user.setUserType(UserType.NOT_ACTIVATED);
+        user.setMessageAbility(MessageAbility.UNMUTED);
+        user.setUserStatus(UserStatus.OFFLINE);
+        user.setRegisterDateTime(LocalDateTime.now());
+        return user;
     }
 
     public void setUserStatus(UserStatus userStatus) {
