@@ -80,17 +80,17 @@ public class UserService {
     }
 
     /**
-     * Toggles the message ability of the user(mute or unmute).
+     * Searches for a User, with the given id, in the user table.
      *
-     * @param id - id of user we want to toggle
-     * @return Successful response if the user exists and toggling operation succeeded,
-     * returns failure response if the user does not exist.
+     * @param id - User's id to search for.
+     * @return User object response if the user, returns null otherwise.
      */
     private User getUserById(int id){
         return userRepository.findById(id).orElse(null);
     }
 
     /**
+     * Updates user's data in the DB.
      *
      * @param user Object contains user data that needs to be updated.
      */
@@ -100,6 +100,7 @@ public class UserService {
 
     /**
      * toggles the message ability (mute or unmute)
+     *
      * @param id - id of user we want to toggle
      * @return Successful response if the user exists and toggling operation succeeded,
      * returns failure response if the user does not exist.
@@ -158,6 +159,12 @@ public class UserService {
                 user->user.getUserType().equals(UserType.REGISTERED) || user.getUserType().equals(UserType.ADMIN)).collect(Collectors.toList());
     }
 
+    /**
+     * Searches for a User's username, with the given id, in the user table.
+     *
+     * @param userId, User's id to search for.
+     * @return String, user's username.
+     */
     public String getUserNameById(int userId){
         User user = getUserById(userId);
         if ( user != null) {

@@ -75,8 +75,8 @@ public class UserController {
     /**
      * Toggles the message ability if the users have the right permissions to do it.
      * @param userIdPerformsTheToggle - id of user who wants to toggle another user
-     * @param userIdToToggle - id of the user we performs the toggle on
-     * @return Successful response if the toggle succeeded otherwise- failure response with the reason
+     * @param userIdToToggle - id of the user we perform the toggle on
+     * @return Successful response if the toggle succeeded otherwise - failure response with the reason
      */
 
     @PutMapping("/auth/toggle-mute-unmute")

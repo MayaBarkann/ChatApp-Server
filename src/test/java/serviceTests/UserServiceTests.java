@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Optional;
@@ -27,73 +28,19 @@ public class UserServiceTests {
     @Autowired
     private UserRepository userRepository;
 
-    private String email="some.email@gmail.com";
+    private final String EMAIL="some.email@gmail.com";
 
-    private String username="someUsername";
+    private final String USERNAME ="someUsername";
 
-    private String password="Password$1";
+    private final String PASSWORD ="Password$1";
+
+    private final int ID = 111;
 
     private Response<String> response;
 
     private Response<User> userResponse;
 
-    private void deleteUserIfExists(String email){
-        User user = userRepository.findByEmail(email);
-        if(user!=null) {
-            userRepository.deleteById(user.getId());
-        }
-    }
-
-    @Test
-    public void validateUserInput_emailIsNull_returnsFailureResponse(){
-        response = userService.validateUserInput(null,username);
-        assertTrue(!response.isSucceed() && response.getData()==null, "Email is null, but method didn't return failure response.");
-    }
-
-    @Test
-    public void validateUserInput_emailIsEmpty_returnsFailureResponse(){
-        response = userService.validateUserInput("",username);
-        assertTrue(!response.isSucceed() && response.getData()==null, "Email is empty, but method didn't return failure response.");
-    }
-
-
-    @Test
-    public void validateUserInput_usernameIsNull_returnsFailureResponse(){
-        response = userService.validateUserInput(email,null);
-        assertTrue(!response.isSucceed() && response.getData()==null, "Username is null, but method didn't return failure response.");
-    }
-
-
-    @Test
-    public void validateUserInput_usernameIsEmpty_returnsFailureResponse(){
-        response = userService.validateUserInput(email,"");
-        assertTrue(!response.isSucceed() && response.getData()==null, "Username is empty, but method didn't return failure response.");
-    }
-
-    @Test
-    public void validateUserInput_emailIsTaken_returnsFailureResponse(){
-        User user = userRepository.findByUsername(username);
-        if(user!=null) {
-            userRepository.deleteById(user.getId());
-        }
-        userService.addUser(email,"Password$1",username);
-        response = userService.validateUserInput(email,username);
-        assertTrue(!response.isSucceed() && response.getData()==null, "Email is taken, but method didn't return failure response.");
-    }
-
-    @Test
-    public void validateUserInput_usernameIsTaken_returnsFailureResponse(){
-        User user = userRepository.findByEmail(email);
-        if(user!=null) {
-            userRepository.deleteById(user.getId());
-        }
-        userService.addUser(email,password,username);
-        response = userService.validateUserInput(email,username);
-        assertTrue(!response.isSucceed() && response.getData()==null, "email is null, but method didn't return failure response.");
-    }
-
-    @Test
-    public void validateUserInput_notEmptyNotNullUsernameEmailAreFree_returnsSuccessfulResponse(){
+    private void deleteUserIfExists(String email,String username){
         User user = userRepository.findByEmail(email);
         if(user!=null) {
             userRepository.deleteById(user.getId());
@@ -102,14 +49,67 @@ public class UserServiceTests {
         if(user!=null) {
             userRepository.deleteById(user.getId());
         }
-        response = userService.validateUserInput(email,username);
+    }
+
+    private void addUserIfNotExists(String email,String username,String password){
+        if(userRepository.findByEmail(email)==null && userRepository.findByUsername(username)==null){
+            userRepository.save(new User(username,email,password));
+        }
+    }
+
+    @Test
+    public void validateUserInput_emailIsNull_returnsFailureResponse(){
+        response = userService.validateUserInput(null, USERNAME);
+        assertTrue(!response.isSucceed() && response.getData()==null, "Email is null, but method didn't return failure response.");
+    }
+
+    @Test
+    public void validateUserInput_emailIsEmpty_returnsFailureResponse(){
+        response = userService.validateUserInput("", USERNAME);
+        assertTrue(!response.isSucceed() && response.getData()==null, "Email is empty, but method didn't return failure response.");
+    }
+
+
+    @Test
+    public void validateUserInput_usernameIsNull_returnsFailureResponse(){
+        response = userService.validateUserInput(EMAIL,null);
+        assertTrue(!response.isSucceed() && response.getData()==null, "Username is null, but method didn't return failure response.");
+    }
+
+
+    @Test
+    public void validateUserInput_usernameIsEmpty_returnsFailureResponse(){
+        response = userService.validateUserInput(EMAIL,"");
+        assertTrue(!response.isSucceed() && response.getData()==null, "Username is empty, but method didn't return failure response.");
+    }
+
+    @Test
+    public void validateUserInput_emailIsTaken_returnsFailureResponse(){
+        addUserIfNotExists(EMAIL, USERNAME, PASSWORD);
+        response = userService.validateUserInput(EMAIL, USERNAME);
+        assertTrue(!response.isSucceed() && response.getData()==null, "Email is taken, but method didn't return failure response.");
+    }
+
+    @Test
+    public void validateUserInput_usernameIsTaken_returnsFailureResponse(){
+        addUserIfNotExists(EMAIL, USERNAME, PASSWORD);
+        response = userService.validateUserInput(EMAIL, USERNAME);
+        assertTrue(!response.isSucceed() && response.getData()==null, "email is null, but method didn't return failure response.");
+    }
+
+    @Test
+    public void validateUserInput_notEmptyNotNullUsernameEmailAreFree_returnsSuccessfulResponse(){
+        deleteUserIfExists(EMAIL, USERNAME);
+        response = userService.validateUserInput(EMAIL, USERNAME);
         assertTrue(response.isSucceed() && response.getData()!=null, "Email and username are free, but method didn't return a successful response.");
     }
 
     @Test
     public void toggleMessageAbility_userExistsUnmuted_userSetToMutedReturnsSuccessfulResponse(){
-        userService.addUser(email,password,username);
-        User user = userRepository.findByEmail(email);
+        addUserIfNotExists(EMAIL, USERNAME, PASSWORD);
+        User user = userRepository.findByEmail(EMAIL);
+        user.setMessageAbility(MessageAbility.UNMUTED);
+        userRepository.save(user);
 
         userResponse = userService.toggleMessageAbility(user.getId());
         Optional<User> checkUser = userRepository.findById(user.getId());
@@ -120,8 +120,8 @@ public class UserServiceTests {
 
     @Test
     public void toggleMessageAbility_userExistsMuted_userSetToUnmutedReturnsSuccessfulResponse(){
-        userService.addUser(email,password,username);
-        User user = userRepository.findByEmail(email);
+        addUserIfNotExists(EMAIL, PASSWORD, USERNAME);
+        User user = userRepository.findByEmail(EMAIL);
         user.setMessageAbility(MessageAbility.MUTED);
         userRepository.save(user);
 
@@ -133,18 +133,18 @@ public class UserServiceTests {
 
     @Test
     public void toggleMessageAbility_userNotExists_returnsFailureResponse(){
-        userService.addUser(email,password,username);
-        User user = userRepository.findByEmail(email);
-        userRepository.deleteById(user.getId());
+        if(userRepository.findById(ID).isPresent()) {
+            userRepository.deleteById(ID);
+        }
 
-        userResponse = userService.toggleMessageAbility(user.getId());
+        userResponse = userService.toggleMessageAbility(ID);
         assertTrue(!userResponse.isSucceed(), "User doesn't exist but toggleMessageAbility() didn't return failure response");
     }
 
     @Test
     public void changeStatus_userExistsStatusOnline_userStatusSetToAway(){
-        userService.addUser(email,password,username);
-        User user = userRepository.findByEmail(email);
+        addUserIfNotExists(EMAIL, PASSWORD, USERNAME);
+        User user = userRepository.findByEmail(EMAIL);
         user.setUserStatus(UserStatus.ONLINE);
         userRepository.save(user);
 
@@ -156,8 +156,8 @@ public class UserServiceTests {
 
     @Test
     public void changeStatus_userExistsStatusAway_userStatusOnline(){
-        userService.addUser(email,password,username);
-        User user = userRepository.findByEmail(email);
+        addUserIfNotExists(EMAIL, PASSWORD, USERNAME);
+        User user = userRepository.findByEmail(EMAIL);
         user.setUserStatus(UserStatus.AWAY);
         userRepository.save(user);
 
@@ -169,8 +169,8 @@ public class UserServiceTests {
 
     @Test
     public void changeStatus_userExistsStatusOffline_returnsFailureResponse(){
-        userService.addUser(email,password,username);
-        User user = userRepository.findByEmail(email);
+        addUserIfNotExists(EMAIL, PASSWORD, USERNAME);
+        User user = userRepository.findByEmail(EMAIL);
         user.setUserStatus(UserStatus.OFFLINE);
         userRepository.save(user);
 
@@ -182,11 +182,12 @@ public class UserServiceTests {
 
     @Test
     public void changeStatus_userNotExists_returnsFailureResponse(){
-        userService.addUser(email,password,username);
-        User user = userRepository.findByEmail(email);
-        userRepository.deleteById(user.getId());
+        if(userRepository.findById(ID).isPresent()) {
+            userRepository.deleteById(ID);
+        }
 
-        userResponse = userService.changeStatus(user.getId());
+        userResponse = userService.changeStatus(ID);
         assertTrue(!userResponse.isSucceed(), "User doesn't exist but change status action didn't return failure response.");
     }
+
 }
