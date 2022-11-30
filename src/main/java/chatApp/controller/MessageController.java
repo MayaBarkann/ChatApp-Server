@@ -68,13 +68,8 @@ public class MessageController {
     public ResponseEntity<String> sendPersonalMessage(@RequestAttribute("userId") int senderId, @RequestParam String reciverName, @RequestBody String message) {
         int reciverID;
         Response<Integer> reciverIdResponse = userService.getUserIdByName(reciverName);
-        if(reciverIdResponse.isSucceed())
-        {
-            reciverID=reciverIdResponse.getData();
-        }
-        else {
-            return ResponseEntity.badRequest().body(reciverIdResponse.getMessage());
-        }
+        if (reciverIdResponse.isSucceed()) reciverID = reciverIdResponse.getData();
+        else return ResponseEntity.badRequest().body(reciverIdResponse.getMessage());
         Response<Boolean> response = permissionService.checkPermission(senderId, UserActions.SendPersonalMessage);
         Response<Boolean> response2 = permissionService.checkPermission(reciverID, UserActions.ReceivePersonalMessage);
         if (response.isSucceed() && response2.isSucceed()) {
@@ -101,7 +96,7 @@ public class MessageController {
     public ResponseEntity<Map<String, OutputMessage>> getPersonalMessages(@RequestAttribute("userId") int senderId, @RequestParam String reciverName) {
         int reciverId;
         Response<Integer> reciverIdResponse = userService.getUserIdByName(reciverName);
-        if(reciverIdResponse.isSucceed())  reciverId=reciverIdResponse.getData();
+        if (reciverIdResponse.isSucceed()) reciverId = reciverIdResponse.getData();
         else return ResponseEntity.badRequest().body(null);
         List<Message> result;
         result = messageService.getChannelMessages(senderId, reciverId);
