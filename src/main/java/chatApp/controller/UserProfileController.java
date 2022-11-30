@@ -7,6 +7,8 @@ import chatApp.controller.entities.UserProfileToPresent;
 import chatApp.service.PermissionService;
 import chatApp.service.UserProfileService;
 import chatApp.service.UserService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +19,7 @@ import chatApp.entities.User;
 @RequestMapping("auth/profile")
 public class UserProfileController {
 
+    public static final Logger logger = LogManager.getLogger(UserProfileController.class);
     @Autowired
     private UserProfileService userProfileService;
     @Autowired
@@ -39,9 +42,11 @@ public class UserProfileController {
         }
         Response<Boolean> response = permissionService.checkPermission(userId, UserActions.HasProfile);
         if (!response.isSucceed()){
+            logger.info(String.format("user with id %d tried to edit profile but this user does not exists" , userId ));
             return ResponseEntity.badRequest().body(null);
 
         } else if(!response.getData()){
+            logger.info(String.format("user with id %d tried to edit profile but he does not have the write permissions" , userId ));
             return ResponseEntity.status(401).body(null);
 
         }
@@ -85,7 +90,7 @@ public class UserProfileController {
                             responseViewUser.getData()));
                 }
             }
-
+            logger.info("user with id %d tried to load other user profile with user name %s", userId, usernameToView);
             return ResponseEntity.status(401).body(null);
         }
 
