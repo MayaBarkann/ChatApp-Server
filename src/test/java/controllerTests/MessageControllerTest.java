@@ -65,7 +65,10 @@ public class MessageControllerTest {
             }
         }
     }
+    @Test
+    public void sendMessage_For_Youreslf(){
 
+    }
     @Test
     public void testSendPublicMessage() {
         User user = users.get(0);
