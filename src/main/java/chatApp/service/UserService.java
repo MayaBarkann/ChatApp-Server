@@ -1,11 +1,10 @@
 package chatApp.service;
 
-import chatApp.controller.entities.UserToPresent;
+
 import chatApp.entities.*;
 import chatApp.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -157,6 +156,20 @@ public class UserService {
     public List<User> getAllRegisteredUser(){
         return userRepository.findAll().stream().filter(
                 user->user.getUserType().equals(UserType.REGISTERED) || user.getUserType().equals(UserType.ADMIN)).collect(Collectors.toList());
+    }
+
+    /**
+     * Searches for a User's id, with the given username, in the user table.
+     *
+     * @param name, User's username to search for.
+     * @return Response<Integer> object, contains user's id if action successful, otherwise - contains failure message.
+     */
+    public Response<Integer> getUserIdByName(String name){
+        User user = userRepository.findByUsername(name);
+        if(user != null){
+            return Response.createSuccessfulResponse(user.getId());
+        }
+        return Response.createFailureResponse("User with name: " + name + "not found");
     }
 
     /**
