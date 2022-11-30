@@ -70,20 +70,22 @@ public class UserProfileController {
      * @return response with the user profile if it has the permissions for it, if not return failure response with the right message
      */
     @GetMapping("/load")
-    public ResponseEntity<UserProfileToPresent> getUserProfileByUsername(@RequestAttribute("userId") int userId, @RequestParam("id_of_user_profile_to_view") String usernameToView){
+    public ResponseEntity<UserProfileToPresent> getUserProfileByUsername(@RequestAttribute("userId") int userId, @RequestParam("usernameToView") String usernameToView){
         Integer userIdToView = userService.getUserIdByUserName(usernameToView);
+        System.out.println(usernameToView);
         if (userIdToView == null){
+            System.out.println("did not find user by user name");
             return ResponseEntity.badRequest().body(null);
         }
         Response<Boolean> responseRequestUserHasPermissionsToViewProfile = permissionService.checkPermission(userId, UserActions.ViewProfile);
         Response<Boolean> responseUserToViewHasProfile = permissionService.checkPermission(userId, UserActions.HasProfile);
 
         if(responseRequestUserHasPermissionsToViewProfile.isSucceed() && responseUserToViewHasProfile.isSucceed()){
-
+            System.out.println("user exists");
             if(responseRequestUserHasPermissionsToViewProfile.getData() && responseUserToViewHasProfile.getData()){
                 Response<UserProfile> responseViewProfile = userProfileService.getUserProfileById(userIdToView);
                 Response<User> responseViewUser = userService.findUserById(userIdToView);
-
+                System.out.println(responseUserToViewHasProfile.isSucceed());
                 if(responseViewProfile.getData().isPublic() || userId == userIdToView){
 
                     return ResponseEntity.ok(UserProfileToPresent.createFromUserProfileAndUser(responseViewProfile.getData(),
