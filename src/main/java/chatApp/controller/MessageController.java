@@ -56,7 +56,7 @@ public class MessageController {
         if (response.isSucceed()) {
             if (response.getData()) {
                 List<Message> messageList = messageService.loadPublicMessages(Optional.ofNullable(start), Optional.ofNullable(end));
-                List<OutputMessage> result = messageList.stream().map(message -> OutputMessage.createPublicMessage(message, userService.getUserNameById(message.getId()))).collect(Collectors.toList());
+                List<OutputMessage> result = messageList.stream().map(message -> OutputMessage.createPublicMessage(message, userService.getUserNameById(message.getSenderId()))).collect(Collectors.toList());
                 return ResponseEntity.ok(result);
             }
             return ResponseEntity.status(401).body(null);
