@@ -51,7 +51,6 @@ public class UserProfileController {
 
         }
 
-        UserProfile oldUserProfile = userProfileService.getUserProfileById(userId).getData();
         UserProfile newUserProfile = UserProfile.createUserProfileFromIdAndUserProfileToPresent(userId, userProfileToPresent);
         Response<UserProfile> responseEdit = userProfileService.editUserProfile(newUserProfile);
 
@@ -70,7 +69,7 @@ public class UserProfileController {
      * @return response with the user profile if it has the permissions for it, if not return failure response with the right message
      */
     @GetMapping("/load")
-    public ResponseEntity<UserProfileToPresent> getUserProfileByUsername(@RequestAttribute("userId") int userId, @RequestParam("usernameToView") String usernameToView){
+    public ResponseEntity<UserProfileToPresent> getUserProfileByUsername(@RequestAttribute("userId") int userId, @RequestBody String usernameToView){
         Integer userIdToView = userService.getUserIdByUserName(usernameToView);
         System.out.println(usernameToView);
         if (userIdToView == null){
@@ -81,11 +80,9 @@ public class UserProfileController {
         Response<Boolean> responseUserToViewHasProfile = permissionService.checkPermission(userId, UserActions.HasProfile);
 
         if(responseRequestUserHasPermissionsToViewProfile.isSucceed() && responseUserToViewHasProfile.isSucceed()){
-            System.out.println("user exists");
             if(responseRequestUserHasPermissionsToViewProfile.getData() && responseUserToViewHasProfile.getData()){
                 Response<UserProfile> responseViewProfile = userProfileService.getUserProfileById(userIdToView);
                 Response<User> responseViewUser = userService.findUserById(userIdToView);
-                System.out.println(responseUserToViewHasProfile.isSucceed());
                 if(responseViewProfile.getData().isPublic() || userId == userIdToView){
 
                     return ResponseEntity.ok(UserProfileToPresent.createFromUserProfileAndUser(responseViewProfile.getData(),
@@ -95,7 +92,7 @@ public class UserProfileController {
             logger.info("user with id %d tried to load other user profile with user name %s", userId, usernameToView);
             return ResponseEntity.status(401).body(null);
         }
-
+        System.out.println("bad request");
         return ResponseEntity.badRequest().body(null);
     }
 

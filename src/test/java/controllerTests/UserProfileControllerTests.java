@@ -24,7 +24,6 @@ import java.util.List;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class UserProfileControllerTests {
 
-    //private static final Logger logger = LogManager.getLogger(UserProfileControllerTests.class);
     private static List<UserProfile> userProfiles = new ArrayList<>();
     private static List<User> users = new ArrayList<>();
     @Autowired
@@ -43,7 +42,7 @@ public class UserProfileControllerTests {
             users.add(user);
 
         }
-        //userProfiles.get(0).setPublic(true);
+
         users.get(0).setUserType(UserType.REGISTERED);
         users.get(1).setUserType(UserType.GUEST);
         users.get(2).setUserType(UserType.ADMIN);
