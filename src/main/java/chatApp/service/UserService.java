@@ -1,8 +1,11 @@
 package chatApp.service;
 
 
+import chatApp.controller.UserController;
 import chatApp.entities.*;
 import chatApp.repository.UserRepository;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +22,8 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+    private static final Logger logger = LogManager.getLogger(UserService.class);
+
     /**
      * Checks if user email and username are not null or empty, and aren't already taken by other users.
      *
@@ -27,18 +32,29 @@ public class UserService {
      * @return Response<String> object, if user input is valid returns the email, if user input is invalid returns error message.
      */
     public Response<String> validateUserInput(String email, String username){
+        logger.trace("UserService validateUserInput method start");
+        logger.debug("validateUserInput method params: String email = " + email + ", String username = " + username);
+        logger.trace("Checking if email is null or empty.");
         if (email == null || email.isEmpty()) {
+            logger.debug("validateUserInput returns failure response (false). Reason: Email can't be null or empty.");
             return Response.createFailureResponse("Email can't be null or empty.");
         }
+        logger.trace("Checking if username is null or empty.");
         if (username == null || username.isEmpty()) {
+            logger.debug("validateUserInput returns failure response (false). Reason: Username can't be null or empty.");
             return Response.createFailureResponse("Username can't be null or empty.");
         }
+        logger.trace("Checking if user with input email already exists in DB.");
         if (userRepository.findByEmail(email) != null) {
+            logger.debug("validateUserInput returns failure response (false). Reason: " + email + "is already taken by another user in DB.");
             return Response.createFailureResponse(String.format("Email %s exists in users table", email));
         }
+        logger.trace("Checking if user with input username already exists in DB.");
         if (userRepository.findByUsername(username) != null) {
+            logger.debug("validateUserInput returns failure response (false). Reason: " + username + "is already taken by another user in DB.");
             return Response.createFailureResponse(String.format("Username %s exists in users table", username));
         }
+        logger.debug("validateUserInput returns successful response (true). Email and password and username are valid.");
         return Response.createSuccessfulResponse(email);
     }
 
@@ -51,24 +67,22 @@ public class UserService {
      * @return a Response, contains: if action succeeded - data=saved user, isSucceeded=true, message=null; if action failed - data = null. isSucceeded = false, message=reason for failure
      */
     public Response<User> addUser(String email,String password,String username) {
+        logger.trace("UserService addUser method start.");
+        logger.debug("addUser method params: String email = " + email  + ",String password = " + password + ",String username = " + username);
+        logger.trace("addUser method: Checking if param values are valid.");
         Response<String> response = validateUserInput(email,username);
         if(!response.isSucceed()){
+            logger.debug("addUser returns failure response (false). Reason: " + response.getMessage());
             return Response.createFailureResponse(response.getMessage());
         }
-        /*
-        User newUser = new User(username,email,password);
-        newUser.setPassword(ServiceUtil.encryptPassword(newUser.getPassword()));
-        newUser.setUserType(UserType.NOT_ACTIVATED);
-        newUser.setUserStatus(UserStatus.OFFLINE);
-        newUser.setMessageAbility(MessageAbility.UNMUTED);
-        newUser.setRegisterDateTime(LocalDateTime.now());
-        */
         User newUser = User.createNotActivatedUser(username,email,ServiceUtil.encryptPassword(password));
         try {
             newUser = userRepository.save(newUser);
         } catch (DataAccessException e) {
+            logger.error("Error occurred while trying to write user data to DB. User wasn't added." + e);
             return Response.createFailureResponse("Error occurred while trying to register user to database.");
         }
+        logger.debug("addUser returns successful response (true). user was added to DB.");
         return Response.createSuccessfulResponse(newUser);
     }
 
@@ -79,10 +93,15 @@ public class UserService {
      * @return Response<User> object, if user was found - contains the User's object, if user doesn't exist - contains the failure message.
      */
     public Response<User> findUserById(int id){
+        logger.trace("UserService findUserById method start.");
+        logger.debug("findUserById method param: int id = " + id);
+        logger.trace("attempting to find user in DB.");
         Optional<User> user = userRepository.findById(id);
         if(user.isPresent()){
+            logger.debug("findUserById returns successful response with the found user Object: " + user.get());
             return Response.createSuccessfulResponse(user.get());
         }
+        logger.debug("findUserById returns successful response with the found user Object: " + user.get());
         return Response.createFailureResponse("User with id: " + id + "not found");
     }
 
@@ -93,6 +112,9 @@ public class UserService {
      * @return User object response if the user, returns null otherwise.
      */
     private User getUserById(int id){
+        logger.trace("UserService getUserById method start.");
+        logger.debug("getUserById method param: int id = " + id);
+        logger.debug("getUserById returns User object if user was found or null if user wasn't found.");
         return userRepository.findById(id).orElse(null);
     }
 
