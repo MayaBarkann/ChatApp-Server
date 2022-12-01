@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "userProfile")
@@ -20,24 +21,36 @@ public class UserProfile {
     private boolean isPublic;
     private String imageUrl;
 
+
     public UserProfile() { }
 
-//    public static UserProfile createUserProfileFromIdAndUserProfileToPresent(int id, boolean isPublic, UserProfileToPresent userProfileToPresent){
-//        UserProfile userProfile = new UserProfile();
-//        userProfile.id = id;
-//        userProfile.firstName = userProfileToPresent.getFirstName();
-//        userProfile.lastName = userProfileToPresent.getLastName();
-//        userProfile.dateOfBirth = userProfileToPresent.getDateOfBirth();
-//        userProfile.description = userProfileToPresent.getDescription();
-//        userProfile.isPublic = isPublic;
-//        userProfile.imageUrl = userProfileToPresent.getImageUrl();
-//        return userProfile;
-//
-//    }
+    public UserProfile(int id, String firstName, String lastName, LocalDate dateOfBirth, String description, boolean isPublic, String imageUrl) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.dateOfBirth = dateOfBirth;
+        this.description = description;
+        this.isPublic = isPublic;
+        this.imageUrl = imageUrl;
+    }
+
+    public static UserProfile createUserProfileFromIdAndUserProfileToPresent(int id, UserProfileToPresent userProfileToPresent){
+        UserProfile userProfile = new UserProfile();
+        userProfile.id = id;
+        userProfile.firstName = userProfileToPresent.getFirstName();
+        userProfile.lastName = userProfileToPresent.getLastName();
+        userProfile.dateOfBirth = userProfileToPresent.getDateOfBirth();
+        userProfile.description = userProfileToPresent.getDescription();
+        userProfile.isPublic = userProfileToPresent.isPublic();
+        userProfile.imageUrl = userProfileToPresent.getImageUrl();
+        return userProfile;
+
+    }
 
     public UserProfile(int id) {
         this.id = id;
     }
+
 
     public String getImageUrl() { return imageUrl; }
 

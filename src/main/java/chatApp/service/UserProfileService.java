@@ -46,45 +46,6 @@ public class UserProfileService {
      * @return response with the user profile saved to repository
      */
 
-//    public Response<UserProfile> editUserProfile(UserProfileToPresent userProfileToPresent, String localImagePath, int id){
-//        UserProfile userProfile = userProfileRepository.findById(id);
-//        if(userProfile != null){
-//            UserProfile newUserProfile = UserProfile.createUserProfileFromIdAndUserProfileToPresent(id, userProfile.isPublic(), userProfileToPresent);
-//            if (localImagePath != null){
-//                if (!localImagePath.isEmpty() && !uploadImage(newUserProfile, localImagePath).isSucceed()){
-//
-//                    return Response.createFailureResponse("user profile edition failed- could not upload image to profile");
-//                }
-//            }
-//            userProfileRepository.save(newUserProfile);
-//
-//            return Response.createSuccessfulResponse(newUserProfile);
-//        }
-//
-//        return Response.createFailureResponse("user profile not exists");
-//    }
-
-//    public Response<UserProfile> editUserProfile(UserProfileToPresent userProfileToPresent, int id){
-//        UserProfile userProfile = userProfileRepository.findById(id);
-//        String imagePath = userProfileToPresent.getImageUrl();
-//        if(userProfile != null){
-//            UserProfile newUserProfile = UserProfile.createUserProfileFromIdAndUserProfileToPresent(id, userProfile.isPublic(), userProfileToPresent);
-//            if (!imagePath.equals(userProfile.getImageUrl())){
-//                if(imagePath == null || imagePath.isEmpty()){
-//                    storage.delete(BUCKET, Integer.toString(id));
-//                } else if (!imagePath.isEmpty() && !uploadImage(newUserProfile, imagePath).isSucceed()){
-//
-//                    return Response.createFailureResponse("user profile edition failed- could not upload image to profile");
-//                }
-//            }
-//            userProfileRepository.save(newUserProfile);
-//
-//            return Response.createSuccessfulResponse(newUserProfile);
-//        }
-//
-//        return Response.createFailureResponse("user profile not exists");
-//    }
-
     public Response<UserProfile> editUserProfile(UserProfile userProfile){
 
         if(userProfile != null && userProfileRepository.findById(userProfile.getId()) != null){
@@ -93,10 +54,12 @@ public class UserProfileService {
             if(newImagePath == null || newImagePath.isEmpty()){
                 storage.delete(BUCKET, Integer.toString(userProfile.getId()));
             } else if (!newImagePath.isEmpty() && !uploadImage(userProfile, newImagePath).isSucceed()){
-
+                System.out.println(newImagePath);
                 return Response.createFailureResponse("user profile edition failed- could not upload image to profile");
             }
             userProfileRepository.save(userProfile);
+            System.out.println(newImagePath);
+            System.out.println(getUserProfileById(userProfile.getId()));
 
             return Response.createSuccessfulResponse(userProfile);
         }
@@ -122,5 +85,7 @@ public class UserProfileService {
             return Response.createFailureResponse("could not upload image " + e.getMessage());
         }
     }
+
+
 
 }

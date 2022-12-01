@@ -188,9 +188,12 @@ public class UserService {
      */
     public String getUserNameById(int userId){
         User user = getUserById(userId);
-        if ( user != null) {
-            return user.getUsername();
-        }
-        return null;
+        return user != null ? user.getUsername() : null;
+    }
+
+    public Integer getUserIdByUserName(String username){
+        User user = userRepository.findByUsername(username);
+        return user != null ? user.getId() : null;
+
     }
 }
