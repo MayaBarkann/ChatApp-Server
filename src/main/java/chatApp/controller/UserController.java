@@ -65,6 +65,9 @@ public class UserController {
      */
     @RequestMapping(method = RequestMethod.GET, value = "/activate/{activationToken}")
     public ResponseEntity<String> activateUser(@PathVariable("activationToken") String activationToken) {
+        if(activationToken==null || activationToken==""){
+            return ResponseEntity.badRequest().body("Activation token can't be null or empty.");
+        }
         Response<String> response = userActivationService.activateUser(activationToken);
         if (response.isSucceed()) {
             return ResponseEntity.ok("Account with email" + response.getData() + " was activated successfully.");
@@ -75,10 +78,9 @@ public class UserController {
     /**
      * Toggles the message ability if the users have the right permissions to do it.
      * @param userIdPerformsTheToggle - id of user who wants to toggle another user
-     * @param userIdToToggle - id of the user we performs the toggle on
-     * @return Successful response if the toggle succeeded otherwise- failure response with the reason
+     * @param userIdToToggle - id of the user we perform the toggle on
+     * @return Successful response if the toggle succeeded otherwise - failure response with the reason
      */
-
     @PutMapping("/auth/toggle-mute-unmute")
     public ResponseEntity<String> toggleMuteUnmute(@RequestAttribute("userId") int userIdPerformsTheToggle, @RequestParam("userIdToToggle") int userIdToToggle){
         Response<Boolean> responseHasPermissionsToToggle = permissionService.checkPermission(userIdPerformsTheToggle,UserActions.MuteOrUnmuteOthers);
@@ -105,7 +107,6 @@ public class UserController {
      * @param userId
      * @return response entity
      */
-
     @PutMapping("/auth/change-status")
     public ResponseEntity<String> changeStatus(@RequestAttribute("userId") int userId){
         //todo: add a check (at filter layer) that checks that the user is connected

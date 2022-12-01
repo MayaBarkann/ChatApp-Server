@@ -3,6 +3,7 @@ package chatApp.service;
 
 import chatApp.entities.*;
 import chatApp.repository.UserRepository;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -54,14 +55,21 @@ public class UserService {
         if(!response.isSucceed()){
             return Response.createFailureResponse(response.getMessage());
         }
+        /*
         User newUser = new User(username,email,password);
         newUser.setPassword(ServiceUtil.encryptPassword(newUser.getPassword()));
         newUser.setUserType(UserType.NOT_ACTIVATED);
         newUser.setUserStatus(UserStatus.OFFLINE);
         newUser.setMessageAbility(MessageAbility.UNMUTED);
         newUser.setRegisterDateTime(LocalDateTime.now());
-        User user = userRepository.save(newUser);
-        return Response.createSuccessfulResponse(user);
+        */
+        User newUser = User.createNotActivatedUser(username,email,ServiceUtil.encryptPassword(password));
+        try {
+            newUser = userRepository.save(newUser);
+        } catch (DataAccessException e) {
+            return Response.createFailureResponse("Error occurred while trying to register user to database.");
+        }
+        return Response.createSuccessfulResponse(newUser);
     }
 
     /**
@@ -79,17 +87,17 @@ public class UserService {
     }
 
     /**
-     * Toggles the message ability of the user(mute or unmute).
+     * Searches for a User, with the given id, in the user table.
      *
-     * @param id - id of user we want to toggle
-     * @return Successful response if the user exists and toggling operation succeeded,
-     * returns failure response if the user does not exist.
+     * @param id - User's id to search for.
+     * @return User object response if the user, returns null otherwise.
      */
     private User getUserById(int id){
         return userRepository.findById(id).orElse(null);
     }
 
     /**
+     * Updates user's data in the DB.
      *
      * @param user Object contains user data that needs to be updated.
      */
@@ -99,6 +107,7 @@ public class UserService {
 
     /**
      * toggles the message ability (mute or unmute)
+     *
      * @param id - id of user we want to toggle
      * @return Successful response if the user exists and toggling operation succeeded,
      * returns failure response if the user does not exist.
@@ -156,6 +165,13 @@ public class UserService {
         return userRepository.findAll().stream().filter(
                 user->user.getUserType().equals(UserType.REGISTERED) || user.getUserType().equals(UserType.ADMIN)).collect(Collectors.toList());
     }
+
+    /**
+     * Searches for a User's id, with the given username, in the user table.
+     *
+     * @param name, User's username to search for.
+     * @return Response<Integer> object, contains user's id if action successful, otherwise - contains failure message.
+     */
     public Response<Integer> getUserIdByName(String name){
         User user = userRepository.findByUsername(name);
         if(user != null){
@@ -163,6 +179,13 @@ public class UserService {
         }
         return Response.createFailureResponse("User with name: " + name + "not found");
     }
+
+    /**
+     * Searches for a User's username, with the given id, in the user table.
+     *
+     * @param userId, User's id to search for.
+     * @return String, user's username.
+     */
     public String getUserNameById(int userId){
         User user = getUserById(userId);
         if ( user != null) {

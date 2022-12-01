@@ -18,27 +18,23 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = SpringApp.class)
-public class UserServiceCreateUserTests {
+public class UserServiceAddUserTests {
     @Autowired
     private UserService userService;
     @Autowired
     private UserRepository userRepository;
-
-    private final String email = "some.email@gmail.com";
-    private final String password = "hfghF$ff123";
-    private final String username = "someUsername";
+    private final String EMAIL = "chat.app3000@gmail.com";
+    private final String PASSWORD = "hfghF$ff123";
+    private final String USERNAME = "someUsername";
     private User user;
 
     @Before
     public void initEach(){
-        user = userRepository.findByEmail(email);
-        if(user!=null) {
-            userRepository.deleteById(user.getId());
+        user = userRepository.findByEmail(EMAIL);
+        if(user==null) {
+            user=userService.addUser(EMAIL, PASSWORD, USERNAME).getData();
         }
-        userService.addUser(email,password,username);
-        user = userRepository.findByEmail(email);
     }
-
 
     @Test
     public void addNewUser_userNotExistInDBInputCorrect_userAddedToDB(){
@@ -48,17 +44,17 @@ public class UserServiceCreateUserTests {
 
     @Test
     public void addNewUser_userNotExistInDB_addedUserEmailIsCorrect(){
-        assertEquals(email, user.getEmail(), "Inputted user email and the email saved in user table in DB don't match.");
+        assertEquals(EMAIL, user.getEmail(), "Inputted user email and the email saved in user table in DB don't match.");
     }
 
     @Test
     public void addNewUser_userNotExistInDB_addedUserPasswordIsCorrect(){
-        assertTrue(ServiceUtil.isPasswordCorrect(user.getPassword(),password), "Inputted user's password and decrypted password from user table in DB don't match.");
+        assertTrue(ServiceUtil.isPasswordCorrect(user.getPassword(), PASSWORD), "Inputted user's password and decrypted password from user table in DB don't match.");
     }
 
     @Test
     public void addNewUser_userNotExistInDB_userAddedUsernameCorrect(){
-        assertEquals(this.username, user.getUsername(), "Inputted user's username and username saved in table user in DB don't match.");
+        assertEquals(this.USERNAME, user.getUsername(), "Inputted user's username and username saved in table user in DB don't match.");
     }
 
     @Test
@@ -79,29 +75,25 @@ public class UserServiceCreateUserTests {
 
     @Test
     public void addUser_userWithSameEmailExistsInDB_newUserNotAddedToDB(){
-        userService.addUser(email,"gggjFG5$1","anotherUser");
-        long count = userRepository.countByEmail(email);
-        User checkUser = userRepository.findByEmail(email);
+        userService.addUser(EMAIL,"gggjFG5$1","anotherUser").getData();
+        User checkUser = userRepository.findByEmail(EMAIL);
+        long count = userRepository.countByEmail(EMAIL);
         assertTrue(count==1 && checkUser.getId()== user.getId(), "User with same email exists but a new User with the same email was added.");
 
     }
 
     @Test
     public void addUser_userWithSameUsernameExistsInDB_newUserNotAddedToDB(){
-        userService.addUser("daadd@gmail.com","gggjFG5$1",this.username);
-        long count = userRepository.countByUsername(this.username);
-        System.out.println(count);
-
-        User checkUser = userRepository.findByUsername(username);
-        System.out.println(checkUser.getId() + "," +user.getId());
+        userService.addUser("daadd@gmail.com","gggjFG5$1",USERNAME).getData();
+        User checkUser = userRepository.findByEmail(EMAIL);
+        long count = userRepository.countByUsername(USERNAME);
         assertTrue(count==1 && checkUser.getId()==user.getId(), "User with same username exists but a new User with the same username was added.");
     }
 
     @Test
     public void addUser_userAlreadyExistsInDB_existingUserNotChanged(){
-        userService.addUser(email,"gggjFG5$1","fdfds");
-        User checkUser = userRepository.findByEmail(email);
+        userService.addUser(EMAIL,"gggjFG5$1","fdfds").getData();
+        User checkUser = userRepository.findByEmail(EMAIL);
         assertEquals(checkUser, user, "User already exists but adding user with same email changed his field values.");
     }
-
 }
