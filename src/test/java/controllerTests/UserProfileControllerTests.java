@@ -141,15 +141,39 @@ public class UserProfileControllerTests {
         Assertions.assertEquals(response.getStatusCode().value(),200,"admin user can get his own profile");
     }
 
-    //todo: go back and check again about setting local date as now
     @Test
-    public void editUserProfile_userIdOfRegisteredUser_Ok(){
+    public void editUserProfile_userIdOfRegisteredUser_EqualsNewProfile(){
         User registeredUser = users.get(3);
         UserProfileToPresent userProfileToPresent = UserProfileToPresent.createFromUserProfileAndUser(userProfiles.get(3), registeredUser);
-        userProfileToPresent.setDateOfBirth(LocalDate.now());
+        LocalDate beforeChange = userProfileRepo.findById(registeredUser.getId()).getDateOfBirth();
+        LocalDate newDifferentDate = beforeChange.minusDays(1);
+        userProfileToPresent.setDateOfBirth(newDifferentDate);
         ResponseEntity<UserProfileToPresent> response = userProfileController.editUserProfile(registeredUser.getId(), userProfileToPresent);
-        Assertions.assertEquals(response.getBody(),userProfileToPresent,"registered user can edit his profile");
+        Assertions.assertEquals(response.getBody(),userProfileToPresent,"registered user can edit his profile " +
+                "and the returning value should be the new user profile saved in data base");
     }
+
+    @Test
+    public void editUserProfile_userIdOfAdminUser_EqualsNewProfile(){
+        User adminUser = users.get(2);
+        UserProfileToPresent userProfileToPresent = UserProfileToPresent.createFromUserProfileAndUser(userProfiles.get(2), adminUser);
+        LocalDate beforeChange = userProfileRepo.findById(adminUser.getId()).getDateOfBirth();
+        LocalDate newDifferentDate = beforeChange.minusDays(1);
+        userProfileToPresent.setDateOfBirth(newDifferentDate);
+        ResponseEntity<UserProfileToPresent> response = userProfileController.editUserProfile(adminUser.getId(), userProfileToPresent);
+        Assertions.assertEquals(response.getBody(),userProfileToPresent,"admin user can edit his profile " +
+                "and the returning value should be the new user profile saved in data base");
+    }
+
+    @Test
+    public void editUserProfile_userIdOfGuestUser_Unauthorized(){
+        User guestUser = users.get(1);
+        UserProfileToPresent userProfileToPresent = UserProfileToPresent.createFromUserProfileAndUser(userProfiles.get(1), guestUser);
+        userProfileToPresent.setDateOfBirth(LocalDate.now());
+        ResponseEntity<UserProfileToPresent> response = userProfileController.editUserProfile(guestUser.getId(), userProfileToPresent);
+        Assertions.assertEquals(response.getStatusCode().value(),401,"guest user can not edit his profile");
+    }
+
 
 
 
