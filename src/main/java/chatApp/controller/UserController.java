@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,25 +41,25 @@ public class UserController {
     public ResponseEntity<String> createUser(@RequestBody UserRegister userRegister) {
         logger.trace("UserController createUser method start. RequestMethod.POST, path value: /register.");
         logger.debug("param ReguestBody userRegister = " + userRegister);
-        if(userRegister==null){
+        if (userRegister == null) {
             logger.warn("userRegister request body param is null.");
             logger.debug("createUser returns ResponseEntity.badRequest(), reason: RegisteredUser is null.");
             return ResponseEntity.badRequest().body("Error during user register. Reason: " + "registered user can't be null.");
         }
         logger.trace("createUser method: Checking if userRegister email and password are in valid format.");
-        Response<String> isValidResponse = ControllerUtil.validateUserCredentials(userRegister.getEmail(),userRegister.getPassword());
-        if(!isValidResponse.isSucceed()){
+        Response<String> isValidResponse = ControllerUtil.validateUserCredentials(userRegister.getEmail(), userRegister.getPassword());
+        if (!isValidResponse.isSucceed()) {
             logger.debug("createUser returns ResponseEntity.badRequest(), reason: ." + isValidResponse.getMessage());
             return ResponseEntity.badRequest().body("Error during user register. Reason: " + isValidResponse.getMessage());
         }
         logger.trace("createUser method: Checking if userRegister username is in valid format.");
         isValidResponse = ControllerUtil.isUsernameValid(userRegister.getUsername());
-        if(!isValidResponse.isSucceed()){
+        if (!isValidResponse.isSucceed()) {
             logger.debug("createUser returns ResponseEntity.badRequest(), reason: ." + isValidResponse.getMessage());
             return ResponseEntity.badRequest().body("Error during user register. Reason: " + isValidResponse.getMessage());
         }
         logger.trace("createUser method: Attempting to add user to DB.");
-        Response<User> responseAddUser = userService.addUser(userRegister.getEmail(),userRegister.getPassword(),userRegister.getUsername());
+        Response<User> responseAddUser = userService.addUser(userRegister.getEmail(), userRegister.getPassword(), userRegister.getUsername());
         if (responseAddUser.isSucceed()) {
             Response<String> responseEmail = userActivationService.sendActivationEmail(userRegister.getEmail());
             if (!responseEmail.isSucceed()) {
@@ -84,7 +85,7 @@ public class UserController {
     public ResponseEntity<String> activateUser(@PathVariable("activationToken") String activationToken) {
         logger.trace("UserController activateUser method start. RequestMethod.GET, path value: /activate/{activationToken}.");
         logger.debug("param PathVariable activationToken = " + activationToken);
-        if(activationToken==null || activationToken==""){
+        if (activationToken == null || activationToken == "") {
             logger.warn("method param activationToken is null or empty.");
             return ResponseEntity.badRequest().body("Activation token can't be null or empty.");
         }
@@ -100,25 +101,26 @@ public class UserController {
 
     /**
      * Toggles the message ability if the users have the right permissions to do it.
+     *
      * @param userIdPerformsTheToggle - id of user who wants to toggle another user
-     * @param userIdToToggle - id of the user we perform the toggle on
+     * @param userIdToToggle          - id of the user we perform the toggle on
      * @return Successful response if the toggle succeeded otherwise - failure response with the reason
      */
     @PutMapping("/auth/toggle-mute-unmute")
-    public ResponseEntity<String> toggleMuteUnmute(@RequestAttribute("userId") int userIdPerformsTheToggle, @RequestParam("userIdToToggle") int userIdToToggle){
+    public ResponseEntity<String> toggleMuteUnmute(@RequestAttribute("userId") int userIdPerformsTheToggle, @RequestParam("userIdToToggle") int userIdToToggle) {
         logger.trace("UserController toggleMuteUnmute method start. RequestMethod.PUT, path value: /auth/toggle-mute-unmute.");
         logger.debug("param RequestAttribute(\"userId\") int userIdPerformsTheToggle = " + userIdPerformsTheToggle);
         logger.debug("param @RequestParam(\"userIdToToggle\") int userIdToToggle = " + userIdToToggle);
 
-        Response<Boolean> responseHasPermissionsToToggle = permissionService.checkPermission(userIdPerformsTheToggle,UserActions.MuteOrUnmuteOthers);
-        Response<Boolean> responseUserExistsAndCanBeToggledByOthers = permissionService.checkPermission(userIdToToggle,UserActions.MuteOrUnmuteOthers);
+        Response<Boolean> responseHasPermissionsToToggle = permissionService.checkPermission(userIdPerformsTheToggle, UserActions.MuteOrUnmuteOthers);
+        Response<Boolean> responseUserExistsAndCanBeToggledByOthers = permissionService.checkPermission(userIdToToggle, UserActions.MuteOrUnmuteOthers);
 
         logger.trace("toggleMuteUnmute method: Checking if user's message ability can be toggled.");
-        if(responseHasPermissionsToToggle.isSucceed() && responseUserExistsAndCanBeToggledByOthers.isSucceed()){
-            if(responseHasPermissionsToToggle.getData() && !responseUserExistsAndCanBeToggledByOthers.getData()){
+        if (responseHasPermissionsToToggle.isSucceed() && responseUserExistsAndCanBeToggledByOthers.isSucceed()) {
+            if (responseHasPermissionsToToggle.getData() && !responseUserExistsAndCanBeToggledByOthers.getData()) {
                 logger.trace("toggleMuteUnmute method: Attempting to toggle user's message ability.");
                 Response<User> responsOfToggleUser = userService.toggleMessageAbility(userIdToToggle);
-                if(responsOfToggleUser.isSucceed()){
+                if (responsOfToggleUser.isSucceed()) {
                     logger.debug("toggleMuteUnmute returns ResponseEntity.ok");
                     return ResponseEntity.ok("user ability to send messages has changed successfully");
                 }
@@ -133,22 +135,23 @@ public class UserController {
     /**
      * method for changing the user status. If the user status is online - the method changes the status to away
      * and the other way around
+     *
      * @param userId
      * @return response entity
      */
     @PutMapping("/auth/change-status")
-    public ResponseEntity<String> changeStatus(@RequestAttribute("userId") int userId){
+    public ResponseEntity<String> changeStatus(@RequestAttribute("userId") int userId) {
         //todo: add a check (at filter layer) that checks that the user is connected
         logger.trace("UserController changeStatus method start. RequestMethod.PUT, path value: /auth/toggle-mute-unmute.");
         logger.debug("RequestAttribute(\"userId\") int userId = " + userId);
 
         Response<Boolean> hasPermissionsToChangeStatus = permissionService.checkPermission(userId, UserActions.ChangeStatus);
         logger.trace("changeStatus method: checking if user has permission to change his status.");
-        if(hasPermissionsToChangeStatus.isSucceed()){
-            if(hasPermissionsToChangeStatus.getData()){
+        if (hasPermissionsToChangeStatus.isSucceed()) {
+            if (hasPermissionsToChangeStatus.getData()) {
                 logger.trace("changeStatus method: attempting to change user status.");
-                Response<User> changeStatus= userService.changeStatus(userId);
-                if(changeStatus.isSucceed()){
+                Response<User> changeStatus = userService.changeStatus(userId);
+                if (changeStatus.isSucceed()) {
                     logger.trace("changeStatus returns ResponseEntity.ok.");
                     return ResponseEntity.ok("user status changed successfully to- " + changeStatus.getData().getUserStatus());
                 }
@@ -165,22 +168,22 @@ public class UserController {
     /**
      * Finds and returns all the registered and admin users.
      *
-     * @param userId, int id of user that requests the list.
-     * @return ResponseEntity<List<UserToPresent>>, Response entity containing the list of all registered and admin users with the data that can be shown.
+     * @param userId,  int id of user that requests the list.
+     * @param fromDate - optional parameter, if not given - the method returns all registered users.
+     *                 if given - the method returns all registered users that registered after the given date.
+     * @return ResponseEntity<List < UserToPresent>>, Response entity containing the list of all registered and admin users with the data that can be shown.
      */
-    @GetMapping("/auth/get-all-registered-users")
-    public ResponseEntity<List<UserToPresent>> getAllRegisteredUsers(@RequestAttribute("userId") int userId){
+    @GetMapping("/auth/get-registered-users")
+    public ResponseEntity<List<UserToPresent>> getAllRegisteredUsers(@RequestAttribute("userId") int userId, @RequestParam(required = false) OffsetDateTime fromDate) {
         logger.trace("UserController getAllRegisteredUsers method start. RequestMethod.GET, path value: /auth/get-all-registered-users.");
         logger.debug("RequestAttribute(\"userId\") int userId = " + userId);
-
         Response<Boolean> hasPermissionsToGetAllUsers = permissionService.checkPermission(userId, UserActions.GetAllUsers);
         logger.trace("getAllRegisteredUsers method: checking if user has permission for this action.");
-        if(hasPermissionsToGetAllUsers.isSucceed()){
-            if(hasPermissionsToGetAllUsers.getData()){
+        if (hasPermissionsToGetAllUsers.isSucceed()) {
+            if (hasPermissionsToGetAllUsers.getData()) {
                 logger.trace("getAllRegisteredUsers method: attempting to retrieve the list.");
                 List<UserToPresent> listOfRegisteredUsers =
-                        userService.getAllRegisteredUser().stream().map(UserToPresent :: createFromUser).collect(Collectors.toList());
-
+                        userService.getRegisteredUser(ControllerUtil.convertOffsetToLocalDateTime(fromDate)).stream().map(UserToPresent::createFromUser).collect(Collectors.toList());
                 logger.trace("getAllRegisteredUsers returns ResponseEntity.ok.");
                 return ResponseEntity.ok(listOfRegisteredUsers);
             }
