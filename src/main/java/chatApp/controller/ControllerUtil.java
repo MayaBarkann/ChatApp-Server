@@ -5,6 +5,8 @@ import chatApp.entities.Response;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -101,7 +103,8 @@ public class ControllerUtil {
         if(offsetDateTime == null){
             return Optional.empty();
         }
-        return Optional.of(offsetDateTime.toLocalDateTime());
+        ZonedDateTime zoned = offsetDateTime.atZoneSameInstant(ZoneId.systemDefault());
+        return Optional.of(zoned.toLocalDateTime());
     }
 
 }
