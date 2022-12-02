@@ -15,7 +15,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
         long deleteByEmail(String email);
         long countByEmail(String email);
         long countByUsername(String username);
-        List<User> findAllByRegisterDateTime(LocalDateTime registerDateTime);
+        
 
 
 }

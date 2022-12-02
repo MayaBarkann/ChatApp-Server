@@ -188,8 +188,8 @@ public class UserService {
         LocalDateTime fromDate;
         if (!fromDateOptional.isPresent()) fromDate = LocalDateTime.MIN;
         else fromDate = fromDateOptional.get();
-        return userRepository.findAllByRegisterDateTime(fromDate).stream().filter(
-                user -> user.getUserType().equals(UserType.REGISTERED) || user.getUserType().equals(UserType.ADMIN)).collect(Collectors.toList());
+        return userRepository.findAll().stream().filter(
+                user -> user.getRegisterDateTime().isAfter(fromDate) && (user.getUserType().equals(UserType.REGISTERED) || user.getUserType().equals(UserType.ADMIN))).collect(Collectors.toList());
     }
 
     /**
