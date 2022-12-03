@@ -35,6 +35,7 @@ public class MessageController {
         this.chatUtil = chatUtil;
     }
 
+
     @PostMapping("/MainRoom/Send")
     public ResponseEntity<String> sendPublicMessage(@RequestBody String message, @RequestAttribute("userId") int senderId) {
         Response<Boolean> response = permissionService.checkPermission(senderId, UserActions.SendMainRoomMessage);
@@ -49,6 +50,7 @@ public class MessageController {
         }
         return ResponseEntity.badRequest().body(response.getMessage());
     }
+
 
     @GetMapping("/MainRoom/Get")
     public ResponseEntity<List<OutputMessage>> getAllMainRoomMessages(@RequestAttribute("userId") int userID, @RequestParam(required = false) LocalDateTime start, @RequestParam(required = false) LocalDateTime end) {
