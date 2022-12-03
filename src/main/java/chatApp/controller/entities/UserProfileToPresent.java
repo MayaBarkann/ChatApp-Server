@@ -17,8 +17,14 @@ public class UserProfileToPresent {
 
     public UserProfileToPresent(){}
 
+    /**
+     * Creates and returns user profile data that can be exposed to other users, combined with the username.
+     *
+     * @param userProfile - UserProfile object, contains all the user profile data.
+     * @param user - User object, contains all the user data, needed for the username data.
+     * @return UserProfileToPresent object, all the user profile data that can be exposed to other users.
+     */
     public static UserProfileToPresent createFromUserProfileAndUser(UserProfile userProfile, User user){
-
         return new UserProfileToPresent(user.getUsername(),user.getEmail(), userProfile.getFirstName(),
                 userProfile.getLastName(), userProfile.getDateOfBirth(), userProfile.getDescription(), userProfile.getImageUrl(), userProfile.isPublic());
     }

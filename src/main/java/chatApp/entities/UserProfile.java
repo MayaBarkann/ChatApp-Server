@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "userProfile")
 public class UserProfile {
-    @Id  //TODO: how do i make sure that the id exists in the user repository
+    @Id
     private int id;
     private String firstName;
     private String lastName;
@@ -20,7 +20,6 @@ public class UserProfile {
     private String description;
     private boolean isPublic;
     private String imageUrl;
-
 
     public UserProfile() { }
 
@@ -34,6 +33,13 @@ public class UserProfile {
         this.imageUrl = imageUrl;
     }
 
+    /**
+     * Creates and returns all the data in the user profile, user's username with addition of user id.
+     *
+     * @param id, int id of the user.
+     * @param userProfileToPresent, UserProfileToPresent object, containing all User Profile data (without id) together with User's username.
+     * @return UserProfile object, all the data in userProfileToPresent with addition of the user id.
+     */
     public static UserProfile createUserProfileFromIdAndUserProfileToPresent(int id, UserProfileToPresent userProfileToPresent){
         UserProfile userProfile = new UserProfile();
         userProfile.id = id;
@@ -50,7 +56,6 @@ public class UserProfile {
     public UserProfile(int id) {
         this.id = id;
     }
-
 
     public String getImageUrl() { return imageUrl; }
 

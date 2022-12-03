@@ -208,18 +208,25 @@ public class UserService {
 
     /**
      * Searches for a User's username, with the given id, in the user table.
+     * If user with given id doesn't exist returns null.
      *
-     * @param userId, User's id to search for.
-     * @return String, user's username.
+     * @param userId, User's id to search by.
+     * @return String, user's username if user exists, otherwise - null.
      */
     public String getUserNameById(int userId) {
         User user = getUserById(userId);
         return user != null ? user.getUsername() : null;
     }
 
+    /**
+     * Searches for a User's id using the given username, in the user table.
+     * If user with given username doesn't exist returns null.
+     *
+     * @param username, User's username search by.
+     * @return Integer, user's id if user exists, otherwise - null.
+     */
     public Integer getUserIdByUserName(String username) {
         User user = userRepository.findByUsername(username);
         return user != null ? user.getId() : null;
-
     }
 }

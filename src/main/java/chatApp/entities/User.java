@@ -25,7 +25,6 @@ public class User {
     private LocalDateTime registerDateTime;
     private LocalDateTime lastLoginDateTime;
 
-
     public User(String username, String email, String password) {
         this.username = username;
         this.email = email;
@@ -36,6 +35,12 @@ public class User {
 
     }
 
+    /**
+     * Creates and returns a User of type Guest.
+     *
+     * @param username - String, username of the user.
+     * @return User object, containing guest user data: username with the prefix "Guest-", a fake random generated email for inner system use, null password, user type GUEST, Message Ability UNMUTED, Status ONLINE, Last login: LocalDateTime.now().
+     */
     public static User createGuestUser(String username){
         User user = new User("Guest-"+username, UUID.randomUUID().toString().replace("-", "") + "@chatapp.guest",null);
         user.setUserType(UserType.GUEST);
@@ -45,6 +50,12 @@ public class User {
         return user;
     }
 
+    /**
+     * Creates and returns a User of type Not Activated (registered but account not activated via email).
+     *
+     * @param username - String, username of the user.
+     * @return User object, containing Not Activated user data: username, email, password, user type NOT_ACTIVATED, Message Ability UMUTED, Status OFFLINE, Register Time: LocalDateTime.now().
+     */
     public static User createNotActivatedUser(String username,String email,String password){
         User user = new User(username, email,password);
         user.setUserType(UserType.NOT_ACTIVATED);

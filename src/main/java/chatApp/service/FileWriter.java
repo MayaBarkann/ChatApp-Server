@@ -12,8 +12,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class FileWriter {
-public static Response<File> writeListToFile(String filePath, List<?> list)
-{
+
+    /**
+     *
+      * @param filePath - the path of the file in which the messages will be saved.
+     * @param list , List of the data objects to write to the file.
+     * @return Response<File> object, contains false and error message if action wasn't successful, otherwise - true, and the File object to which the data was written.
+     */
+public static Response<File> writeListToFile(String filePath, List<?> list){
     Path path= Paths.get(filePath);
     if(!Files.exists(path)) {
        try {

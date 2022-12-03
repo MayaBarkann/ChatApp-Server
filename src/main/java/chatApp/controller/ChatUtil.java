@@ -9,29 +9,39 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
-
 @Component
+/**
+ * This class is used to send messages to the main room and the private channels.
+ */
 public class ChatUtil {
-    /*
-     * This class is used to send messages to the main room and the private channels.
-     *
-     */
     private final SimpMessagingTemplate template;
+
     public ChatUtil(SimpMessagingTemplate template) {
         this.template= template;
     }
+
+    /**
+     * Sends message to Main Chat Room.
+     *
+     * @param message - OutputMessage object, contains: text message to be sent, sender, receiver and timestamp
+     * @return OutputMessage object, the message that was sent.
+     */
     public OutputMessage writeMessageToMainRoom(OutputMessage message) {
         System.out.println("Sending message to main room" + message.getContent());
         template.convertAndSend("/topic/mainChat", message);
         return message;
     }
 
+    /**
+     * Sends message to private chat channel.
+     *
+     * @param message - OutputMessage object, contains: text message to be sent, sender, receiver and timestamp
+     * @return OutputMessage object, the message that was sent.
+     */
     public OutputMessage writeMessageToPrivateChannel(OutputMessage message) {
         System.out.println("Sending message to private channel" + message.getContent());
         template.convertAndSendToUser(message.getReceiver(),"/",message);
         return message;
     }
-
-
 
 }

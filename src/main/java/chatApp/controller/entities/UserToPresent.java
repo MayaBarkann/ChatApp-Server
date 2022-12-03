@@ -21,6 +21,12 @@ public class UserToPresent {
                 '}';
     }
 
+    /**
+     * Creates and returns an object containing user data that can be exposed in requests and responses (without password)
+     * 
+     * @param user - User object, containing all data of the user.
+     * @return UserToPresent, contains only user data that can be exposed (without password).
+     */
     public static UserToPresent createFromUser(User user) {
         return new UserToPresent(user.getUsername(), user.getEmail(), user.getUserType());
     }
