@@ -9,6 +9,13 @@ public class MutableHttpServletRequest extends HttpServletRequestWrapper {
         super(request);
         customHeaders=new HashMap<>();
     }
+
+    /**
+     * Adds a header key, value pair to the customHeaders Map<String,String>.
+     *
+     * @param name String, key name.
+     * @param value String, value paired to the key.
+     */
     public void addHeader(String name, String value){
         this.customHeaders.put(name, value);
     }
@@ -20,6 +27,7 @@ public class MutableHttpServletRequest extends HttpServletRequestWrapper {
         }
         return ((HttpServletRequest) getRequest()).getHeader(name);
     }
+
     public Enumeration<String> getHeaderNames() {
         Set<String> set = new HashSet<>(customHeaders.keySet());
         Enumeration<String> e = ((HttpServletRequest) getRequest()).getHeaderNames();

@@ -14,6 +14,7 @@ import java.util.Set;
 
 public class CorsFilter implements Filter {
     private Set<String> origins = new HashSet<>(Set.of("http://localhost:3000"));
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         Filter.super.init(filterConfig);
@@ -36,7 +37,6 @@ public class CorsFilter implements Filter {
                 return;
             }
         }
-
         filterChain.doFilter(servletRequest, res);
     }
 

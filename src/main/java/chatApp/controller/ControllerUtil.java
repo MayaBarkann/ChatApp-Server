@@ -1,6 +1,5 @@
 package chatApp.controller;
 
-
 import chatApp.entities.Response;
 
 import java.time.LocalDateTime;
@@ -12,7 +11,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 
 public class ControllerUtil {
     public static final Pattern VALID_EMAIL_REGEX = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
@@ -99,6 +97,13 @@ public class ControllerUtil {
                 "At least one special character which includes !@#$%&*()-+=^.\n" +
                 "Must not contain any white spaces.";
     }
+
+    /**
+     * Converts given OffsetToLocalDateTime to LocalDateTime of local zone.
+     *
+     * @param offsetDateTime - OffsetDateTime object, to be converted to LocalDateTime.
+     * @return Optional<LocalDateTime>, contains - the conversion result LocalDateTime if param wasn't null, otherwise- Optional.empty();
+     */
     public static Optional<LocalDateTime> convertOffsetToLocalDateTime(OffsetDateTime offsetDateTime){
         if(offsetDateTime == null){
             return Optional.empty();
