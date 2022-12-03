@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -26,6 +26,14 @@ public class MessageController {
     private final UserService userService;
     private final ChatUtil chatUtil;
 
+    /**
+     * Constructor for MessageController.
+     *
+     * @param messageService    MessageService object.
+     * @param permissionService PermissionService object.
+     * @param userService       UserService object.
+     * @param chatUtil          ChatUtil object.
+     */
     @Autowired
     public MessageController(MessageService messageService, PermissionService permissionService, UserService userService, ChatUtil chatUtil) {
         ControllerUtil.logger.info("MessageController constructor");
@@ -35,7 +43,15 @@ public class MessageController {
         this.chatUtil = chatUtil;
     }
 
-
+    /**
+     * Sends a message to the main room.
+     *
+     * @param message  object contains message content.
+     * @param senderId int representing the sender's id.
+     *                 if sender has permission to send messages to main room then the message is sent.
+     *                 else the function returned a response  with a message that the user does not have permission.
+     * @return ResponseEntity<String> contains sending status.
+     */
     @PostMapping("/MainRoom/Send")
     public ResponseEntity<String> sendPublicMessage(@RequestBody String message, @RequestAttribute("userId") int senderId) {
         Response<Boolean> response = permissionService.checkPermission(senderId, UserActions.SendMainRoomMessage);
@@ -51,13 +67,20 @@ public class MessageController {
         return ResponseEntity.badRequest().body(response.getMessage());
     }
 
-
+    /**
+     * get messages from the main room from given range.
+     * if not given returns all main room messages.
+     * @param userID int representing the user's id.
+     * @param start optional parameter that represents the start of the time range.
+     * @param end optional parameter that represents the end of the time range.
+     * @return ResponseEntity<List<Message>> contains the messages from the main room.
+     */
     @GetMapping("/MainRoom/Get")
-    public ResponseEntity<List<OutputMessage>> getAllMainRoomMessages(@RequestAttribute("userId") int userID, @RequestParam(required = false) LocalDateTime start, @RequestParam(required = false) LocalDateTime end) {
+    public ResponseEntity<List<OutputMessage>> getAllMainRoomMessages(@RequestAttribute("userId") int userID, @RequestParam(required = false) OffsetDateTime start, @RequestParam(required = false) OffsetDateTime end) {
         Response<Boolean> response = permissionService.checkPermission(userID, UserActions.ReceiveMainRoomMessage);
         if (response.isSucceed()) {
             if (response.getData()) {
-                List<Message> messageList = messageService.loadPublicMessages(Optional.ofNullable(start), Optional.ofNullable(end));
+                List<Message> messageList = messageService.loadPublicMessages(ControllerUtil.convertOffsetToLocalDateTime(start), ControllerUtil.convertOffsetToLocalDateTime(end));
                 List<OutputMessage> result = messageList.stream().map(message -> OutputMessage.createPublicMessage(message, userService.getUserNameById(message.getSenderId()))).collect(Collectors.toList());
                 return ResponseEntity.ok(result);
             }
@@ -66,6 +89,16 @@ public class MessageController {
         return ResponseEntity.badRequest().body(null);
     }
 
+    /**
+     * Sends a message to a private room.
+     *
+     * @param message      object contains message content.
+     * @param senderId     int representing the sender's id.
+     * @param reciverName  String representing the receiver's name.
+     *                     if sender and receiver have permission to send messages to private room then the message is sent.
+     *                     else the function returned a response  with a message that the user does not have permission.
+     * @return ResponseEntity<String> contains sending status.
+     */
     @PostMapping("/channel/send")
     public ResponseEntity<String> sendPersonalMessage(@RequestAttribute("userId") int senderId, @RequestParam String reciverName, @RequestBody String message) {
         int reciverID;
@@ -89,8 +122,9 @@ public class MessageController {
         return ResponseEntity.badRequest().body("reciver not found.");
     }
 
-    /*
-      @param userId the id of the user who wants to get the messages
+    /**
+     * get all messages from a specific channel (private conversation).
+      @param senderId the id of the user who wants to get the messages
       @param reciverName the name of the other user in the private channel
       @return a map of messages between the two users
      */
@@ -104,7 +138,11 @@ public class MessageController {
         result = messageService.getChannelMessages(senderId, reciverId);
         return ResponseEntity.ok(getMessagesMapFromList(result));
     }
-
+   /**
+     * get all messages from all specific user channels (private conversations).
+      @param userId the id of the user who wants to get the messages
+      @return a map with other participant name as a key and a list of messages between the two users as a value.
+     */
     @GetMapping("/channel/getAll")
     public ResponseEntity<Map<String, OutputMessage>> getAllUserChannels(@RequestAttribute("userId") int userId) {
         Response<Boolean> response = permissionService.checkPermission(userId, UserActions.ReceivePersonalMessage);
@@ -120,6 +158,7 @@ public class MessageController {
     }
 
     /**
+     *
      * @param userId the user id
      * @return all the private messages that the user has sent or received
      */

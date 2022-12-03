@@ -38,4 +38,12 @@ public class UserRegister {
     public String getUsername(){
         return username;
     }
+
+    @Override
+    public String toString() {
+        return "UserRegister{" +
+                "email='" + email + '\'' +
+                ", username='" + username + '\'' +
+                '}';
+    }
 }
