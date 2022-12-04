@@ -30,10 +30,9 @@ public class AppConfig {
         return registrationBean;
     }*/
 
-    /*
-    * this method is used to register the token filter
-    * the token filter initialized with the auth service
-    * the token filter is running first in the filter chain
+    /**
+    * this method is used to register the cors filter
+    *
     * @return FilterRegistrationBean<TokenFilter>
     *
     */
@@ -48,6 +47,12 @@ public class AppConfig {
         return registrationBean;
     }
 
+    /**
+     * his method is used to register the token filter
+     * the token filter initialized with the auth service
+     * the token filter is running first in the filter chain
+     * @return FilterRegistrationBean<TokenFilter>
+     */
     @Bean
     public FilterRegistrationBean<TokenFilter> filterRegistrationBean() {
         logger.info("FilterRegistrationBean has been created");

@@ -1,17 +1,15 @@
-package controllerTests;
-
+package controller;
 
 import chatApp.SpringApp;
-import chatApp.controller.ControllerUtil;
 import chatApp.controller.UserController;
 import chatApp.controller.entities.UserRegister;
 import chatApp.entities.*;
+import chatApp.repository.UserProfileRepository;
 import chatApp.repository.UserRepository;
 import chatApp.service.PermissionService;
 import chatApp.service.UserService;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,13 +24,14 @@ import static org.junit.jupiter.api.Assertions.*;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = SpringApp.class)
 public class UserControllerTests {
-    private static final Logger logger = LogManager.getLogger(ControllerUtil.class);
     @Autowired
     private UserController userController;
     @Autowired
     private UserService userService;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private UserProfileRepository profileRepository;
     @Autowired
     private PermissionService permissionService;
     private final String EMAIL = "chat.app3000@gmail.com";
@@ -76,6 +75,11 @@ public class UserControllerTests {
     private String createTokenForTesting(String email, LocalDateTime date){
         String strToEncode = email+"#"+ date.plusHours(24);
         return Base64.getEncoder().encodeToString(strToEncode.getBytes());
+    }
+
+    @AfterEach
+    public void cleanUpEach(){
+        deleteUserIfExists(EMAIL, USERNAME);
     }
 
     @Test
@@ -162,9 +166,11 @@ public class UserControllerTests {
     public void activateUser_activationTokenValidUserExistsNotActivated_returnsResponseEntityOkUserActivated(){
         addUserForTests(EMAIL,PASSWORD,USERNAME);
         responseEntity = userController.activateUser(createTokenForTesting(EMAIL,LocalDateTime.now()));
+        User user = userRepository.findByEmail(EMAIL);
 
         assertEquals(200, responseEntity.getStatusCodeValue(), "User exists and token is valid, but response entity didn't return ok response.");
         assertSame(userRepository.findByEmail(EMAIL).getUserType(), UserType.REGISTERED, "User exists and token is valid, but user wasn't activated");
+        profileRepository.deleteById(user.getId());
     }
 
     @Test
@@ -219,6 +225,7 @@ public class UserControllerTests {
         responseEntity = userController.toggleMuteUnmute(idUserToggles,userToggled.getId());
         assertEquals(200, responseEntity.getStatusCodeValue(), "Existing admin user toggles message ability of existing not Admin User, but method doesn't return an Ok response.");
         assertNotSame(userMessageAbilityBeforeToggle, userRepository.findById(userToggled.getId()).get().getMessageAbility(), "Existing admin user toggles message ability of existing not Admin User, but toggled user message ability doesn't change.");
+        deleteUserIfExists("email@gmail.com","some_username");
     }
 
 
@@ -231,6 +238,7 @@ public class UserControllerTests {
         responseEntity = userController.toggleMuteUnmute(idUserToggles,userToggled.getId());
         assertEquals(401, responseEntity.getStatusCodeValue(), "Existing user with no permission to toggle is not allowed toggle message ability of any User, but method doesn't return an unauthorized 401 response.");
         assertSame(userMessageAbilityBeforeToggle, userRepository.findById(userToggled.getId()).get().getMessageAbility(), "Existing user with no permission to toggle is not allowed toggles message ability of any User, but toggled user message ability changed.");
+        deleteUserIfExists("email@gmail.com","some_username");
     }
 
 
@@ -243,6 +251,7 @@ public class UserControllerTests {
         responseEntity = userController.toggleMuteUnmute(idUserToggles,userToggled.getId());
         assertEquals(401, responseEntity.getStatusCodeValue(), "Existing admin user is not allowed to toggle message ability of any admin User, but method doesn't return an unauthorized 401 response.");
         assertSame(userMessageAbilityBeforeToggle, userRepository.findById(userToggled.getId()).get().getMessageAbility(), "Existing admin user is not allowed toggles message ability of any admin User, but toggled user message ability changed");
+        deleteUserIfExists("email@gmail.com","some_username");
     }
 
     @Test
@@ -253,6 +262,7 @@ public class UserControllerTests {
 
         responseEntity = userController.toggleMuteUnmute(idUserToggles,idForToggle);
         assertEquals(400, responseEntity.getStatusCodeValue(), "Existing admin user toggles message ability of not existing user, but method doesn't return a bad request response.");
+        deleteUserIfExists("email@gmail.com","some_username");
     }
 
 
@@ -264,6 +274,7 @@ public class UserControllerTests {
 
         responseEntity = userController.toggleMuteUnmute(idUserToggles,idForToggle);
         assertEquals(400, responseEntity.getStatusCodeValue(), "Existing admin user toggles message ability of not existing user, but method doesn't return a bad request response.");
+        deleteUserIfExists("email@gmail.com","some_username");
     }
 
     @Test

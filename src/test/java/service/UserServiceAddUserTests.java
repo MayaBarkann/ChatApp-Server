@@ -1,4 +1,4 @@
-package serviceTests;
+package service;
 
 import chatApp.SpringApp;
 import chatApp.entities.MessageAbility;
@@ -8,8 +8,9 @@ import chatApp.entities.UserType;
 import chatApp.repository.UserRepository;
 import chatApp.service.ServiceUtil;
 import chatApp.service.UserService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,7 +29,18 @@ public class UserServiceAddUserTests {
     private final String USERNAME = "someUsername";
     private User user;
 
-    @Before
+    private void deleteUserIfExists(String email,String username){
+        User user = userRepository.findByEmail(email);
+        if(user!=null) {
+            userRepository.deleteById(user.getId());
+        }
+        user = userRepository.findByUsername(username);
+        if(user!=null) {
+            userRepository.deleteById(user.getId());
+        }
+    }
+
+    @BeforeEach
     public void initEach(){
         user = userRepository.findByEmail(EMAIL);
         if(user==null) {
@@ -36,11 +48,15 @@ public class UserServiceAddUserTests {
         }
     }
 
+    @AfterEach
+    public void cleanUpEach(){
+        deleteUserIfExists(EMAIL, USERNAME);
+    }
+
     @Test
     public void addNewUser_userNotExistInDBInputCorrect_userAddedToDB(){
         assertNotNull(user, "New user wasn't added to DB,even though such user doesn't exist in DB and all input is correct");
     }
-
 
     @Test
     public void addNewUser_userNotExistInDB_addedUserEmailIsCorrect(){
@@ -96,4 +112,5 @@ public class UserServiceAddUserTests {
         User checkUser = userRepository.findByEmail(EMAIL);
         assertEquals(checkUser, user, "User already exists but adding user with same email changed his field values.");
     }
+
 }

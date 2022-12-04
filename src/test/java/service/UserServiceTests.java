@@ -1,4 +1,4 @@
-package serviceTests;
+package service;
 
 import chatApp.SpringApp;
 import chatApp.entities.MessageAbility;
@@ -7,7 +7,8 @@ import chatApp.entities.User;
 import chatApp.entities.UserStatus;
 import chatApp.repository.UserRepository;
 import chatApp.service.UserService;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -48,6 +49,11 @@ public class UserServiceTests {
         if(userRepository.findByEmail(email)==null && userRepository.findByUsername(username)==null){
             userRepository.save(new User(username,email,password));
         }
+    }
+
+    @AfterEach
+    public void cleanUpEach(){
+        deleteUserIfExists(EMAIL, USERNAME);
     }
 
     @Test

@@ -1,4 +1,4 @@
-package entityTests;
+package entities;
 
 import chatApp.entities.MessageAbility;
 import chatApp.entities.User;

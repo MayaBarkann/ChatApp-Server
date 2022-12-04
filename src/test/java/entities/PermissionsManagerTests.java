@@ -1,4 +1,4 @@
-package entityTests;
+package entities;
 
 import chatApp.entities.PermissionsManager;
 import chatApp.entities.UserActions;
