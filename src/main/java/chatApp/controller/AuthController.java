@@ -55,20 +55,18 @@ public class AuthController {
     /**
      * Logs-out the user from the application.
      * Erases user's authentication token.
-     * Sets Registered User as offline in database
-     * Erases Guest User from database.
+     * If user is Registered User sets his status as offline in database
+     * If user is Guest User erases his record from the database.
      *
-     * @param authToken String, user's authentication token.
+     * @param userId int, id of the user that wants to log out.
      * @return ResponseEntity<String>, if action succeeded - holds logged-out user's username, otherwise - error message.
      */
-
-    //todo: chnage this so it will receive @RequestAttribute("userId")
     @RequestMapping(value = "auth/logout" ,method = RequestMethod.GET)
-    public ResponseEntity<String> userLogout(@RequestHeader("token") String authToken) {
-        if(!ServiceUtil.isTokenFormatValid(authToken)){
-            return ResponseEntity.badRequest().body("Error during logout. Reason: Token format is invalid.");
+    public ResponseEntity<String> userLogout(@RequestAttribute("userId") int userId) {
+        if(!authService.isUserExist(userId)){
+            return ResponseEntity.badRequest().body("Error during logout. Reason: User with given id doesn't exist in database.");
         }
-        Response<String> logoutResponse = authService.userLogout(authToken);
+        Response<String> logoutResponse = authService.userLogout(userId);
         if(!logoutResponse.isSucceed()){
             return ResponseEntity.badRequest().body("Error during logout. Reason: " + logoutResponse.getMessage());
         }

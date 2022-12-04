@@ -120,22 +120,21 @@ public class AuthService {
      * Performs user logout. Erases user's authentication token.
      * Erases Guest User from database. Sets Registered User as Offline in database.
      *
-     * @param authToken String token that authenticates the user.
+     * @param userId int, id of user that wants to log out.
      * @return Response<String> object, if action succeeded - holds user's username, otherwise - holds error message.
      */
-    public Response<String> userLogout(String authToken) {
-        Response<Integer> checkTokenResponse = this.isTokenCorrect(authToken);
-        if (!checkTokenResponse.isSucceed()) {
-            return Response.createFailureResponse("Error occurred during logout: " + checkTokenResponse.getMessage());
-        }
-        int userId = this.getIdFromAuthToken(authToken);
-        authTokensMap.remove(this.getIdFromAuthToken(authToken));
+    public Response<String> userLogout(int userId) {
+        authTokensMap.remove(userId);
         Optional<User> user = userRepository.findById(userId);
         if (!user.isPresent()) {
             return Response.createFailureResponse("Error occurred during logout: user doesn't exist in database.");
         }
         if (user.get().getUserType() == UserType.GUEST) {
-            userRepository.deleteById(userId);
+            try {
+                userRepository.deleteById(userId);
+            }catch (DataAccessException e){
+                return Response.createFailureResponse("Error occurred during logout: guest user with given id couldn't be deleted from database.");
+            }
             return Response.createSuccessfulResponse(user.get().getUsername());
         }
         user.get().setUserStatus(UserStatus.OFFLINE);
@@ -170,7 +169,7 @@ public class AuthService {
      * @param authToken String token that authenticates the user.
      * @return user id as int if token contains user id, otherwise returns -1.
      */
-    public int getIdFromAuthToken(String authToken) {
+    private int getIdFromAuthToken(String authToken) {
         if (!ServiceUtil.isTokenFormatValid(authToken)) {
             return -1;
         }
@@ -184,7 +183,7 @@ public class AuthService {
      * @param authToken String, user authentication token.
      * @return LocalDateTime when the authentication token what created.
      */
-    public Optional<LocalDateTime> getTimeFromAuthToken(String authToken) {
+    private Optional<LocalDateTime> getTimeFromAuthToken(String authToken) {
         if (!ServiceUtil.isTokenFormatValid(authToken)) {
             return Optional.empty();
         }
@@ -205,5 +204,15 @@ public class AuthService {
             return Optional.empty();
         }
         return Optional.of(authToken);
+    }
+
+    /**
+     * Checks if a user with a given id exists in the database.
+     *
+     * @param id, user's id to search for.
+     * @return boolean, true - if user with given id exists in database, false - otherwise.
+     */
+    public boolean isUserExist(int id) {
+        return userRepository.findById(id).isPresent();
     }
 }
