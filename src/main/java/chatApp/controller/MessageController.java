@@ -129,14 +129,18 @@ public class MessageController {
       @return a map of messages between the two users
      */
     @GetMapping("/channel/get")
-    public ResponseEntity<Map<String, OutputMessage>> getPersonalMessages(@RequestAttribute("userId") int senderId, @RequestParam String reciverName) {
+    public ResponseEntity<List<OutputMessage>> getPersonalMessages(@RequestAttribute("userId") int senderId, @RequestParam String reciverName) {
         int reciverId;
+        String senderName = userService.getUserNameById(senderId);
         Response<Integer> reciverIdResponse = userService.getUserIdByName(reciverName);
         if (reciverIdResponse.isSucceed()) reciverId = reciverIdResponse.getData();
         else return ResponseEntity.badRequest().body(null);
-        List<Message> result;
-        result = messageService.getChannelMessages(senderId, reciverId);
-        return ResponseEntity.ok(getMessagesMapFromList(result));
+        List<OutputMessage> result;
+        result = messageService.getChannelMessages(senderId, reciverId)
+                .stream().sorted(Comparator.comparing(Message::getTime))
+                .map(message -> OutputMessage.createPrivateMessage(message, senderName, reciverName))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(result);
     }
    /**
      * get all messages from all specific user channels (private conversations).
@@ -144,12 +148,12 @@ public class MessageController {
       @return a map with other participant name as a key and a list of messages between the two users as a value.
      */
     @GetMapping("/channel/getAll")
-    public ResponseEntity<Map<String, OutputMessage>> getAllUserChannels(@RequestAttribute("userId") int userId) {
+    public ResponseEntity<Map<String,List<OutputMessage>>> getAllUserChannels(@RequestAttribute("userId") int userId) {
         Response<Boolean> response = permissionService.checkPermission(userId, UserActions.ReceivePersonalMessage);
         if (response.isSucceed()) {
             if (response.getData()) {
                 List<Message> userChannels = messageService.getAllUserChannels(userId);
-                Map<String, OutputMessage> result = getMessagesMapFromList(userChannels);
+                Map<String, List<OutputMessage>> result = getMessagesMapFromList(userChannels);
                 return ResponseEntity.ok(result);
             }
             return ResponseEntity.status(401).body(null);
@@ -191,28 +195,35 @@ public class MessageController {
      * @param messages - List<Message>, contains list of messages (each message contains- content, senderId, receiverId, time when wast sent)
      * @return Map<String, OutputMessage>, key: receiverName (for private message), MAIN_ROOM (for public message), value - OutputMessage.
      */
-    private Map<String, OutputMessage> getMessagesMapFromList(List<Message> messages) {
+    private Map<String,List< OutputMessage>> getMessagesMapFromList(List<Message> messages) {
         if (messages == null || messages.isEmpty()) {
             return new HashMap<>();
         }
         messages = messages.stream().sorted(Comparator.comparing(Message::getTime)).collect(Collectors.toList());
-        Map<String, OutputMessage> outputMessages = new HashMap<>();
+        Map<String,List<OutputMessage>> result = new HashMap<>();
+        String mainRoom = MessageType.MAIN_ROOM.toString();
         for (Message message : messages) {
             String senderName = userService.getUserNameById(message.getSenderId());
             switch (message.getType()) {
                 case PERSONAL: {
                     String reciverName = userService.getUserNameById(message.getReceiverId());
-                    outputMessages.put(reciverName, OutputMessage.createPrivateMessage(message, senderName, reciverName));
+                    if(!result.containsKey(reciverName)) {
+                        result.put(reciverName, new ArrayList<>());
+                    }
+                        result.get(reciverName).add(OutputMessage.createPrivateMessage(message, senderName, reciverName));
                     break;
                 }
                 case MAIN_ROOM:
-                    outputMessages.put(MessageType.MAIN_ROOM.toString(), OutputMessage.createPublicMessage(message, senderName));
+                    if(!result.containsKey(mainRoom)) {
+                        result.put(mainRoom, new ArrayList<>());
+                    }
+                    result.get(mainRoom).add(OutputMessage.createPublicMessage(message, senderName));
                     break;
                 default:
                     return null;
             }
         }
-        return outputMessages;
+        return result;
     }
 
 }
