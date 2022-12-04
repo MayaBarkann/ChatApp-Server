@@ -1,12 +1,14 @@
-package serviceTests;
+package service;
 
 import chatApp.SpringApp;
 import chatApp.entities.Response;
 import chatApp.entities.User;
 import chatApp.entities.UserType;
+import chatApp.repository.UserProfileRepository;
 import chatApp.repository.UserRepository;
 import chatApp.service.UserActivationService;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,7 +27,8 @@ public class UserActivationServiceTests {
     private UserActivationService userActivationService;
     @Autowired
     private UserRepository userRepository;
-
+    @Autowired
+    private UserProfileRepository profileRepository;
     private Response<String> response;
     private final String EMAIL = "chat.app3000@gmail.com";
     private final String USERNAME = "someUsername";
@@ -53,18 +56,21 @@ public class UserActivationServiceTests {
         deleteUserIfExists(email,username);
         return userRepository.save(User.createNotActivatedUser(username,email,password));
     }
-    private void addUserIfNotExists(String email,String username,String password){
-        if(userRepository.findByEmail(email)==null && userRepository.findByUsername(username)==null){
-            userRepository.save(new User(username,email,password));
-        }
+
+    @AfterEach
+    public void cleanUpEach(){
+        deleteUserIfExists(EMAIL, USERNAME);
     }
 
     @Test
     public void activateUser_activationTokenValidUserExistsNotActivated_returnsSuccessfulResponse(){
         addUserForTests(EMAIL,PASSWORD,USERNAME);
         response = userActivationService.activateUser(createTokenForTesting(EMAIL,LocalDateTime.now()));
+        User user = userRepository.findByEmail(EMAIL);
+
         assertTrue(response.isSucceed(), "User exists and token is valid, but response isn't successful.");
         assertSame(userRepository.findByEmail(EMAIL).getUserType(), UserType.REGISTERED, "User exists and token is valid, but user wasn't activated");
+        profileRepository.deleteById(user.getId());
     }
 
 
@@ -87,14 +93,14 @@ public class UserActivationServiceTests {
     }
 
     @Test
-    public void activateUser_TokenValidUserNotExists_returnsResponseEntityBadRequest(){
+    public void activateUser_TokenValidUserNotExists_returnsFailureResponse(){
         deleteUserIfExists(EMAIL,"");
         response = userActivationService.activateUser(createTokenForTesting(EMAIL,LocalDateTime.now()));
         assertFalse(response.isSucceed(),"User doesn't exist, but method didn't return failure response.");
     }
 
     @Test
-    public void activateUser_activationTokenExpiredUserExists_returnsResponseEntityBadRequest(){
+    public void activateUser_activationTokenExpiredUserExists_returnsFailureResponse(){
         addUserForTests(EMAIL,PASSWORD,USERNAME);
         response = userActivationService.activateUser(createTokenForTesting(EMAIL,EXPIRED_DATE));
         assertFalse(response.isSucceed(),"Activation token expired, but method didn't return failure response.");
@@ -102,7 +108,7 @@ public class UserActivationServiceTests {
     }
 
     @Test
-    public void activateUser_tokenValidUserAlreadyActivated_returnsResponseEntityBadRequest(){
+    public void activateUser_tokenValidUserAlreadyActivated_returnsFailureResponse(){
         User user = addUserForTests(EMAIL,PASSWORD,USERNAME);
         user.setUserType(UserType.REGISTERED);
         userRepository.save(user);

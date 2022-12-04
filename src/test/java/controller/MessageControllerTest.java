@@ -1,4 +1,4 @@
-package controllerTests;
+package controller;
 
 import chatApp.SpringApp;
 
@@ -17,7 +17,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
 
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package controllerTests;
+package controller;
 
 import chatApp.SpringApp;
 import chatApp.controller.UserProfileController;

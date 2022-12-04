@@ -1,4 +1,4 @@
-package serviceTests;
+package service;
 
 import chatApp.entities.Response;
 import chatApp.service.EmailSender;
