@@ -115,7 +115,8 @@ public class MessageService {
      * @return List of Message objects, containing messages of Personal type sent by the sender (represented by a sender id).
      */
     public List<Message> getAllUserChannels(int senderId) {
-        return messageRepo.findBySenderIdOrReceiverIdAndMessageType(senderId, senderId, MessageType.PERSONAL);
+       return messageRepo.findAll().stream().filter(
+               message -> message.getType()==MessageType.PERSONAL &&( message.getSenderId()==senderId || message.getReceiverId()==senderId)).collect(Collectors.toList());
     }
 
     /**
