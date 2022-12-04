@@ -76,7 +76,7 @@ public class MessageController {
      * @return ResponseEntity<List<Message>> contains the messages from the main room.
      */
     @GetMapping("/MainRoom/Get")
-    public ResponseEntity<List<OutputMessage>> getAllMainRoomMessages(@RequestAttribute("userId") int userID, @RequestParam(required = false) OffsetDateTime start, @RequestParam(required = false) OffsetDateTime end) {
+    public ResponseEntity<List<OutputMessage>> getAllMainRoomMessages(@RequestAttribute("userId") int userID, @RequestParam(required = false) String start, @RequestParam(required = false) String end) {
         Response<Boolean> response = permissionService.checkPermission(userID, UserActions.ReceiveMainRoomMessage);
         if (response.isSucceed()) {
             if (response.getData()) {

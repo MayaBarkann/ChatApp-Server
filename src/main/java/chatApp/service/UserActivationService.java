@@ -133,6 +133,7 @@ public class UserActivationService {
         }
         User user = userRepository.findByEmail(decodeToken(activationToken).get("email"));
         user.setUserType(UserType.REGISTERED);
+        user.setRegisterDateTime(LocalDateTime.now());
         userRepository.save(user);
         Response responseProfileCreate = createUserProfile(user.getId());
         if(!responseProfileCreate.isSucceed()){

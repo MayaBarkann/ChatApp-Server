@@ -41,7 +41,9 @@ public class MessageControllerTest {
     public void setup() {
         logger.info("setup");
         for (int i = 0; i < 5; i++) {
-            users.add(new User("UserNum" + i, "Email" + i + "@gmail.com", "Password"));
+           User usr= new User("UserNum" + i, "Email" + i + "@gmail.com", "Password");
+           users.add(usr);
+
         }
         users.get(0).setUserType(UserType.ADMIN);
         users.get(1).setUserType(UserType.REGISTERED);
@@ -57,8 +59,8 @@ public class MessageControllerTest {
         if (userRepo.findByEmail(users.get(0).getEmail()) == null) {
             users = userRepo.saveAll(users);
         } else {
-            for (User user : users) {
-                user = userRepo.findByEmail(user.getEmail());
+            for (int i = 0; i < users.size(); i++) {
+                users.set(i, userRepo.findByEmail(users.get(i).getEmail()));
             }
         }
     }

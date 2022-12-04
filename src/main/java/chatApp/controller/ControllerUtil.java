@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -101,13 +102,15 @@ public class ControllerUtil {
     /**
      * Converts given OffsetToLocalDateTime to LocalDateTime of local zone.
      *
-     * @param offsetDateTime - OffsetDateTime object, to be converted to LocalDateTime.
+     * @param offsetDateTimeString - OffsetDateTime object, to be converted to LocalDateTime.
      * @return Optional<LocalDateTime>, contains - the conversion result LocalDateTime if param wasn't null, otherwise- Optional.empty();
      */
-    public static Optional<LocalDateTime> convertOffsetToLocalDateTime(OffsetDateTime offsetDateTime){
-        if(offsetDateTime == null){
+    public static Optional<LocalDateTime> convertOffsetToLocalDateTime(String offsetDateTimeString){
+        if(offsetDateTimeString == null || offsetDateTimeString.isEmpty()){
             return Optional.empty();
         }
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+        OffsetDateTime offsetDateTime = OffsetDateTime.parse(offsetDateTimeString, formatter);
         ZonedDateTime zoned = offsetDateTime.atZoneSameInstant(ZoneId.systemDefault());
         return Optional.of(zoned.toLocalDateTime());
     }
