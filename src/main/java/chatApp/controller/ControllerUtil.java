@@ -48,7 +48,7 @@ public class ControllerUtil {
             return Response.createFailureResponse("Password can't be null or empty.");
         }
         Matcher matcher = VALID_PASSWORD_REGEX.matcher(password);
-        if(!matcher.find()) {
+        if(!matcher.find()){
             return Response.createFailureResponse(passwordConstraints());
         }
         return Response.createSuccessfulResponse(password);

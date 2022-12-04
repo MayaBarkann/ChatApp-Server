@@ -139,13 +139,13 @@ public class UserControllerTests {
     @Test
     public void createUser_usernameIsNull_returnsResponseEntityBadRequest(){
         responseEntity = userController.createUser(new UserRegister(EMAIL, PASSWORD, null));
-        assertEquals(responseEntity.getStatusCodeValue(),400,"User's password is null, but response entity didn't return bad request.");
+        assertEquals(responseEntity.getStatusCodeValue(),400,"User's username is null, but response entity didn't return bad request.");
     }
 
     @Test
     public void createUser_usernameIsEmpty_returnsResponseEntityBadRequest(){
         responseEntity = userController.createUser(new UserRegister(EMAIL, PASSWORD, ""));
-        assertEquals(responseEntity.getStatusCodeValue(),400,"User's password is empty, but response entity didn't return bad request.");
+        assertEquals(responseEntity.getStatusCodeValue(),400,"User's username is empty, but response entity didn't return bad request.");
     }
 
 
@@ -160,7 +160,6 @@ public class UserControllerTests {
         responseEntity = userController.createUser(new UserRegister(EMAIL, INVALID_PASSWORD, USERNAME));
         assertEquals(responseEntity.getStatusCodeValue(),400,"User's password format is invalid, but response entity didn't return bad request.");
     }
-
 
     @Test
     public void activateUser_activationTokenValidUserExistsNotActivated_returnsResponseEntityOkUserActivated(){
@@ -228,7 +227,6 @@ public class UserControllerTests {
         deleteUserIfExists("email@gmail.com","some_username");
     }
 
-
     @Test
      public void toggleMuteUnmute_existingUserNoPermissionTogglesExistingUser_returnsResponseEntityUnauthorized(){
         int idUserToggles = addUserForTests("email@gmail.com","some_username",PASSWORD).getId();
@@ -240,7 +238,6 @@ public class UserControllerTests {
         assertSame(userMessageAbilityBeforeToggle, userRepository.findById(userToggled.getId()).get().getMessageAbility(), "Existing user with no permission to toggle is not allowed toggles message ability of any User, but toggled user message ability changed.");
         deleteUserIfExists("email@gmail.com","some_username");
     }
-
 
     @Test
     public void toggleMuteUnmute_existingAdminUserTogglesExistingAdminUser_returnsResponseEntityBadRequest(){
@@ -264,7 +261,6 @@ public class UserControllerTests {
         assertEquals(400, responseEntity.getStatusCodeValue(), "Existing admin user toggles message ability of not existing user, but method doesn't return a bad request response.");
         deleteUserIfExists("email@gmail.com","some_username");
     }
-
 
     @Test
     public void toggleMuteUnmute_notExistingAdminUserTogglesExistingUser_returnsResponseEntityBadRequest(){
