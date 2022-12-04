@@ -38,7 +38,9 @@ public class SocketsUtil {
     public OutputMessage writeMessageToPrivateChannel(OutputMessage message) {
         System.out.println("Sending message to private channel" + message.getContent());
         template.convertAndSendToUser(message.getReceiver(),"/",message);
-        template.convertAndSendToUser(message.getReceiver(),"/",message);
+        ControllerUtil.logger.info("Message sent to:" +"/user/"+message.getReceiver()+"/");
+        template.convertAndSendToUser(message.getSender(),"/",message);
+        ControllerUtil.logger.info("Message sent by:" +"/user/"+message.getSender()+"/");
         return message;
     }
     /**
