@@ -193,4 +193,11 @@ public class UserController {
         logger.debug("getAllRegisteredUsers returns ResponseEntity.status(401) Unauthorized.");
         return ResponseEntity.badRequest().body(null);
     }
+    @GetMapping("/auth/name")
+    public ResponseEntity<String> getUserName(@RequestAttribute("userId") int userId) {
+        logger.trace("UserController getUserName method start. RequestMethod.GET, path value: /auth/get-user-name.");
+        String userName = userService.getUserNameById(userId);
+        logger.info(String.format("getUserName(%i) returns ResponseEntity.ok.",userId));
+        return ResponseEntity.ok(userName);
+    }
 }
