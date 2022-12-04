@@ -2,6 +2,7 @@ package chatApp.controller;
 
 import chatApp.controller.entities.OutputMessage;
 
+import chatApp.controller.entities.UserToPresent;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
@@ -43,6 +44,17 @@ public class ChatUtil {
         template.convertAndSendToUser(message.getReceiver(),"/",message);
         template.convertAndSendToUser(message.getReceiver(),"/",message);
         return message;
+    }
+    /**
+     * notify all other users when a new user is activated.
+     *
+     * @param userToPresent - UserToPresent object, contains: user name, user email, user status
+     * @return UserToPresent object, the user that was activated.
+     */
+    public UserToPresent writeUserToPresent(UserToPresent userToPresent) {
+        System.out.println("Sending user to present" + userToPresent.getUsername());
+        template.convertAndSend("/newUsers", userToPresent);
+        return userToPresent;
     }
 
 }
