@@ -36,4 +36,8 @@ public class UserToPresent {
         this.email = email;
         this.userType = userType;
     }
+
+    public String getUsername() {
+        return username;
+    }
 }

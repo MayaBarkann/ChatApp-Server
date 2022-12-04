@@ -22,6 +22,9 @@ public class AuthController {
      */
     @RequestMapping(value = "/login" ,method = RequestMethod.POST)
     public ResponseEntity<String> userLogin(@RequestBody LoginCredentials loginCred) {
+        if(loginCred==null){
+            return ResponseEntity.badRequest().body("Error during User Login. Reason: Login credentials can't be null");
+        }
         Response<String> validateCredResponse = ControllerUtil.validateUserCredentials(loginCred.getEmail(),loginCred.getPassword());
         if(!validateCredResponse.isSucceed()){
             return ResponseEntity.badRequest().body("Error during User Login. Reason: " + validateCredResponse.getMessage());

@@ -2,21 +2,18 @@ package chatApp.controller;
 
 import chatApp.controller.entities.OutputMessage;
 
-import org.springframework.messaging.handler.annotation.SendTo;
+import chatApp.controller.entities.UserToPresent;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDateTime;
 
 @Component
 /**
  * This class is used to send messages to the main room and the private channels.
  */
-public class ChatUtil {
+public class SocketsUtil {
     private final SimpMessagingTemplate template;
 
-    public ChatUtil(SimpMessagingTemplate template) {
+    public SocketsUtil(SimpMessagingTemplate template) {
         this.template= template;
     }
 
@@ -40,12 +37,22 @@ public class ChatUtil {
      */
     public OutputMessage writeMessageToPrivateChannel(OutputMessage message) {
         System.out.println("Sending message to private channel" + message.getContent());
-        template.convertAndSend("/user/"+ message.getReceiver() + "/" ,message);
-        template.convertAndSend("/user/"+ message.getSender() + "/",message);
-        System.out.println("/user/"+ message.getSender() + "/");
-        System.out.println("/user/"+ message.getReceiver() + "/");
-
+        template.convertAndSendToUser(message.getReceiver(),"/",message);
+        ControllerUtil.logger.info("Message sent to:" +"/user/"+message.getReceiver()+"/");
+        template.convertAndSendToUser(message.getSender(),"/",message);
+        ControllerUtil.logger.info("Message sent by:" +"/user/"+message.getSender()+"/");
         return message;
+    }
+    /**
+     * notify all other users when a new user is activated.
+     *
+     * @param userToPresent - UserToPresent object, contains: user name, user email, user status
+     * @return UserToPresent object, the user that was activated.
+     */
+    public UserToPresent writeUserToPresent(UserToPresent userToPresent) {
+        System.out.println("Sending user to present" + userToPresent.getUsername());
+        template.convertAndSend("/newUsers", userToPresent);
+        return userToPresent;
     }
 
 }
