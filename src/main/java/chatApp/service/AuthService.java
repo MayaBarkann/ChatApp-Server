@@ -73,8 +73,10 @@ public class AuthService {
      * @return Response<String>, if action successful contains the authentication token, otherwise - contains error message.
      */
     public Response<String> userLogin(String email, String password) {
+
         Response<User> validateResponse = this.loginCredentialsValidate(email, password);
         if (!validateResponse.isSucceed()) {
+            System.out.println("this");
             return Response.createFailureResponse(validateResponse.getMessage());
         }
         User validatedUser = validateResponse.getData();
