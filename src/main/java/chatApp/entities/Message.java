@@ -28,19 +28,37 @@ public class Message {
         this.content=content;
         this.time=sendTime;
     }
+
+    /**
+     * Creates and returns a personal Message.
+     *
+     * @param senderId - int, id of the sender.
+     * @param receiverId - int, id of the receiver.
+     * @param content - String, text content of the message.
+     * @param sendTime - LocalDateTime, the date and time the message was sent.
+     * @return Message object, representing a personal message with the data: sender id, receiver id, content, sending time.
+     */
     public static Message createPersonalMessage(int senderId,int receiverId,String content,LocalDateTime sendTime)
     {
         Message message = new Message(senderId, receiverId, content, sendTime);
         message.messageType =MessageType.PERSONAL;
         return message;
     }
+
+    /**
+     * Creates and returns a Message for the Main Chat Room.
+     *
+     * @param senderId - int, id of the sender.
+     * @param content - String, text content of the message.
+     * @param sendTime - LocalDateTime, the date and time the message was sent.
+     * @return Message object, representing a public message for the Main Chat Room, with the data: sender id, receiver id, content, sending time.
+     */
     public static Message createMainRoomMessage(int senderId,String content,LocalDateTime sendTime)
     {
         Message message = new Message(senderId, MainRoomId, content, sendTime);
         message.messageType=MessageType.MAIN_ROOM;
         return message;
     }
-
 
     public int getId() {
         return id;

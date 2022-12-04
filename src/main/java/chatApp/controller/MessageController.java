@@ -185,6 +185,12 @@ public class MessageController {
 
     }
 
+    /**
+     * Creates and returns Map of messages where key is receiver username, and value is the message data.
+     *
+     * @param messages - List<Message>, contains list of messages (each message contains- content, senderId, receiverId, time when wast sent)
+     * @return Map<String, OutputMessage>, key: receiverName (for private message), MAIN_ROOM (for public message), value - OutputMessage.
+     */
     private Map<String, OutputMessage> getMessagesMapFromList(List<Message> messages) {
         if (messages == null || messages.isEmpty()) {
             return new HashMap<>();
