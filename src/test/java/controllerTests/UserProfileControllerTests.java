@@ -174,6 +174,12 @@ public class UserProfileControllerTests {
         Assertions.assertEquals(response.getStatusCode().value(),401,"guest user can not edit his profile");
     }
 
+    @AfterAll
+    public void close() {
+        userProfileRepo.deleteAll(userProfiles);
+        userRepo.deleteAll(users);
+    }
+
 
 
 
