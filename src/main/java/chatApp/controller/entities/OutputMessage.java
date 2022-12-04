@@ -2,11 +2,14 @@ package chatApp.controller.entities;
 
 import chatApp.entities.Message;
 
+import java.time.format.DateTimeFormatter;
+
 public class OutputMessage {
     private String sender;
     private String content;
     private String time;
     private String receiver;
+    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 
     /**
      * Creates and returns a public OutputMessage- representing in Strings an outgoing message in the Main Chat Room.
@@ -16,7 +19,7 @@ public class OutputMessage {
      * @return - OutputMessage object, containing strings of the following data: sender id, content, date and time the message was sent.
      */
     public static OutputMessage createPublicMessage(Message message, String sender) {
-        return new OutputMessage(sender,message.getContent(), message.getTime().toString(), null);
+        return new OutputMessage(sender,message.getContent(), message.getTime().format(formatter), null);
     }
 
     /**
@@ -27,7 +30,7 @@ public class OutputMessage {
      * @return - OutputMessage object, containing strings of the following data: sender id, content, date and time the message was sent.
      */
     public  static OutputMessage createPrivateMessage(Message message, String sender, String receiver) {
-        return new OutputMessage(sender,message.getContent(), message.getTime().toString(), receiver);
+        return new OutputMessage(sender,message.getContent(), message.getTime().format(formatter), receiver);
     }
 
     private OutputMessage(String sender, String content, String time, String receiver) {
