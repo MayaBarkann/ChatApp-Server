@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -24,7 +23,7 @@ public class MessageController {
     private final MessageService messageService;
     private final PermissionService permissionService;
     private final UserService userService;
-    private final ChatUtil chatUtil;
+    private final SocketsUtil chatUtil;
 
     /**
      * Constructor for MessageController.
@@ -35,7 +34,7 @@ public class MessageController {
      * @param chatUtil          ChatUtil object.
      */
     @Autowired
-    public MessageController(MessageService messageService, PermissionService permissionService, UserService userService, ChatUtil chatUtil) {
+    public MessageController(MessageService messageService, PermissionService permissionService, UserService userService, SocketsUtil chatUtil) {
         ControllerUtil.logger.info("MessageController constructor");
         this.messageService = messageService;
         this.permissionService = permissionService;

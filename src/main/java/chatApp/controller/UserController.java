@@ -28,6 +28,8 @@ public class UserController {
     private UserActivationService userActivationService;
     @Autowired
     private PermissionService permissionService;
+    @Autowired
+    private  SocketsUtil socketsUtil;
 
     private static final Logger logger = LogManager.getLogger(UserController.class);
 
@@ -93,6 +95,7 @@ public class UserController {
         Response<String> response = userActivationService.activateUser(activationToken);
         if (response.isSucceed()) {
             logger.debug("activateUser returns ResponseEntity.ok");
+            socketsUtil.writeUserToPresent(UserToPresent.createFromUser(userService.getUserByEmail(response.getData()).getData()));
             return ResponseEntity.ok("Account with email" + response.getData() + " was activated successfully.");
         }
         logger.debug("activateUser returns ResponseEntity.badRequest(), reason: ." + response.getMessage());
@@ -197,7 +200,7 @@ public class UserController {
     public ResponseEntity<String> getUserName(@RequestAttribute("userId") int userId) {
         logger.trace("UserController getUserName method start. RequestMethod.GET, path value: /auth/get-user-name.");
         String userName = userService.getUserNameById(userId);
-        logger.info(String.format("getUserName(%i) returns ResponseEntity.ok.",userId));
+        logger.info(String.format("getUserName(%d) returns ResponseEntity.ok.",userId));
         return ResponseEntity.ok(userName);
     }
 }
