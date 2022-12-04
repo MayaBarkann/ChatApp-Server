@@ -3,21 +3,17 @@ package chatApp.controller;
 import chatApp.controller.entities.OutputMessage;
 
 import chatApp.controller.entities.UserToPresent;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDateTime;
 
 @Component
 /**
  * This class is used to send messages to the main room and the private channels.
  */
-public class ChatUtil {
+public class SocketsUtil {
     private final SimpMessagingTemplate template;
 
-    public ChatUtil(SimpMessagingTemplate template) {
+    public SocketsUtil(SimpMessagingTemplate template) {
         this.template= template;
     }
 

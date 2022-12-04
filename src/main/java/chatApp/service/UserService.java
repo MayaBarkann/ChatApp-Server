@@ -229,4 +229,18 @@ public class UserService {
         User user = userRepository.findByUsername(username);
         return user != null ? user.getId() : null;
     }
+    /**
+     * Searches for a User's with the given email, in the user table.
+     * If user with given email doesn't exist returns Failure response.
+     *
+     * @param email, User's email search by.
+     * @return Response<User>, user's object if user exists, otherwise - Failure response.
+     */
+    public Response<User> getUserByEmail(String email) {
+        User user = userRepository.findByEmail(email);
+        if (user != null) {
+            return Response.createSuccessfulResponse(user);
+        }
+        else return Response.createFailureResponse("User with email: " + email + "not found");
+    }
 }
