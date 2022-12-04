@@ -174,7 +174,7 @@ public class UserController {
      * @return ResponseEntity<List < UserToPresent>>, Response entity containing the list of all registered and admin users with the data that can be shown.
      */
     @GetMapping("/auth/get-registered-users")
-    public ResponseEntity<List<UserToPresent>> getAllRegisteredUsers(@RequestAttribute("userId") int userId, @RequestParam(required = false) OffsetDateTime fromDate) {
+    public ResponseEntity<List<UserToPresent>> getAllRegisteredUsers(@RequestAttribute("userId") int userId, @RequestParam(required = false) String fromDate) {
         logger.trace("UserController getAllRegisteredUsers method start. RequestMethod.GET, path value: /auth/get-all-registered-users.");
         logger.debug("RequestAttribute(\"userId\") int userId = " + userId);
         Response<Boolean> hasPermissionsToGetAllUsers = permissionService.checkPermission(userId, UserActions.GetAllUsers);
