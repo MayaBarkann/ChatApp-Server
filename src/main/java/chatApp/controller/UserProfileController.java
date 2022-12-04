@@ -69,7 +69,7 @@ public class UserProfileController {
      * @return response with the user profile if it has the permissions for it, if not return failure response with the right message
      */
     @GetMapping("/load")
-    public ResponseEntity<UserProfileToPresent> getUserProfileByUsername(@RequestAttribute("userId") int userId, @RequestBody String usernameToView){
+    public ResponseEntity<UserProfileToPresent> getUserProfileByUsername(@RequestAttribute("userId") int userId, @RequestParam String usernameToView){
         Integer userIdToView = userService.getUserIdByUserName(usernameToView);
         System.out.println(usernameToView);
         if (userIdToView == null){

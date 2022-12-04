@@ -55,8 +55,6 @@ public class UserProfileService {
                 return Response.createFailureResponse("user profile edition failed- could not upload image to profile");
             }
             userProfileRepository.save(userProfile);
-            System.out.println(newImagePath);
-            System.out.println(getUserProfileById(userProfile.getId()));
 
             return Response.createSuccessfulResponse(userProfile);
         }
