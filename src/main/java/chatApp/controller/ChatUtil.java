@@ -40,7 +40,11 @@ public class ChatUtil {
      */
     public OutputMessage writeMessageToPrivateChannel(OutputMessage message) {
         System.out.println("Sending message to private channel" + message.getContent());
-        template.convertAndSendToUser(message.getReceiver(),"/",message);
+        template.convertAndSend("/user/"+ message.getReceiver() + "/" ,message);
+        template.convertAndSend("/user/"+ message.getSender() + "/",message);
+        System.out.println("/user/"+ message.getSender() + "/");
+        System.out.println("/user/"+ message.getReceiver() + "/");
+
         return message;
     }
 

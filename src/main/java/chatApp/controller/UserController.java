@@ -197,7 +197,7 @@ public class UserController {
     public ResponseEntity<String> getUserName(@RequestAttribute("userId") int userId) {
         logger.trace("UserController getUserName method start. RequestMethod.GET, path value: /auth/get-user-name.");
         String userName = userService.getUserNameById(userId);
-        logger.info(String.format("getUserName(%i) returns ResponseEntity.ok.",userId));
+        logger.info(String.format("getUserName(%d) returns ResponseEntity.ok.",userId));
         return ResponseEntity.ok(userName);
     }
 }
