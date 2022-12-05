@@ -5,6 +5,7 @@ import chatApp.entities.User;
 import chatApp.controller.entities.UserRegister;
 import chatApp.entities.UserActions;
 import chatApp.controller.entities.UserToPresent;
+import chatApp.entities.UserType;
 import chatApp.service.PermissionService;
 import chatApp.service.UserActivationService;
 import chatApp.service.UserService;
@@ -106,11 +107,12 @@ public class UserController {
      * Toggles the message ability if the users have the right permissions to do it.
      *
      * @param userIdPerformsTheToggle - id of user who wants to toggle another user
-     * @param userIdToToggle          - id of the user we perform the toggle on
+     * @param usernameToToggle          - id of the user we perform the toggle on
      * @return Successful response if the toggle succeeded otherwise - failure response with the reason
      */
     @PutMapping("/auth/toggle-mute-unmute")
-    public ResponseEntity<String> toggleMuteUnmute(@RequestAttribute("userId") int userIdPerformsTheToggle, @RequestParam("userIdToToggle") int userIdToToggle) {
+    public ResponseEntity<String> toggleMuteUnmute(@RequestAttribute("userId") int userIdPerformsTheToggle, @RequestParam("usernameToToggle") String usernameToToggle) {
+        int userIdToToggle = userService.getUserIdByUserName(usernameToToggle);
         logger.trace("UserController toggleMuteUnmute method start. RequestMethod.PUT, path value: /auth/toggle-mute-unmute.");
         logger.debug("param RequestAttribute(\"userId\") int userIdPerformsTheToggle = " + userIdPerformsTheToggle);
         logger.debug("param @RequestParam(\"userIdToToggle\") int userIdToToggle = " + userIdToToggle);
@@ -202,5 +204,13 @@ public class UserController {
         String userName = userService.getUserNameById(userId);
         logger.info(String.format("getUserName(%d) returns ResponseEntity.ok.",userId));
         return ResponseEntity.ok(userName);
+    }
+
+    @GetMapping("/auth/type")
+    public ResponseEntity<String> getUserType(@RequestAttribute("userId") int userId) {
+        logger.trace("UserController getUserType method start. RequestMethod.GET, path value: /auth/type");
+        UserType userType = userService.getUserTypeById(userId);
+        logger.info(String.format("getUserType(%d) returns ResponseEntity.ok.",userId));
+        return ResponseEntity.ok(userType.name());
     }
 }

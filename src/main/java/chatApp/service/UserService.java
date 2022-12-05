@@ -243,4 +243,17 @@ public class UserService {
         }
         else return Response.createFailureResponse("User with email: " + email + "not found");
     }
+
+
+    /**
+     * returns user if exists by given id, else return null
+     * @param userId user id
+     * @return
+     */
+    public UserType getUserTypeById(int userId) {
+        User user = getUserById(userId);
+        return user != null ? user.getUserType() : null;
+    }
+
+
 }
