@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 @RestController
 @CrossOrigin
 public class UserController {
-
     @Autowired
     private UserService userService;
     @Autowired
@@ -112,10 +111,13 @@ public class UserController {
      */
     @PutMapping("/auth/toggle-mute-unmute")
     public ResponseEntity<String> toggleMuteUnmute(@RequestAttribute("userId") int userIdPerformsTheToggle, @RequestParam("usernameToToggle") String usernameToToggle) {
-        int userIdToToggle = userService.getUserIdByUserName(usernameToToggle);
+        Integer userIdToToggle = userService.getUserIdByUserName(usernameToToggle);
+        if(userIdToToggle==null){
+            return ResponseEntity.badRequest().body("User to toggle doesn't exist in DB");
+        }
         logger.trace("UserController toggleMuteUnmute method start. RequestMethod.PUT, path value: /auth/toggle-mute-unmute.");
         logger.debug("param RequestAttribute(\"userId\") int userIdPerformsTheToggle = " + userIdPerformsTheToggle);
-        logger.debug("param @RequestParam(\"userIdToToggle\") int userIdToToggle = " + userIdToToggle);
+        logger.debug("param @RequestParam(\"usernameToToggle\") String usernameToToggle = " + usernameToToggle);
 
         Response<Boolean> responseHasPermissionsToToggle = permissionService.checkPermission(userIdPerformsTheToggle, UserActions.MuteOrUnmuteOthers);
         Response<Boolean> responseUserExistsAndCanBeToggledByOthers = permissionService.checkPermission(userIdToToggle, UserActions.MuteOrUnmuteOthers);

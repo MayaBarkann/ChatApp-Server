@@ -73,7 +73,6 @@ public class AuthService {
      * @return Response<String>, if action successful contains the authentication token, otherwise - contains error message.
      */
     public Response<String> userLogin(String email, String password) {
-
         Response<User> validateResponse = this.loginCredentialsValidate(email, password);
         if (!validateResponse.isSucceed()) {
             System.out.println("this");
@@ -85,7 +84,6 @@ public class AuthService {
             return Response.createFailureResponse("Error during login. " + createTokenResponse.getMessage());
         }
         validatedUser.setUserStatus(UserStatus.ONLINE);
-        validatedUser.setMessageAbility(MessageAbility.UNMUTED);
         validatedUser.setLastLoginDateTime(LocalDateTime.now());
         try {
             userRepository.save(validatedUser);
