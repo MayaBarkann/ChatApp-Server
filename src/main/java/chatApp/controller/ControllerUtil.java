@@ -1,5 +1,6 @@
 package chatApp.controller;
 
+import chatApp.controller.entities.OutputMessage;
 import chatApp.entities.Response;
 
 import java.time.LocalDateTime;
@@ -7,9 +8,12 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -114,5 +118,7 @@ public class ControllerUtil {
         ZonedDateTime zoned = offsetDateTime.atZoneSameInstant(ZoneId.systemDefault());
         return Optional.of(zoned.toLocalDateTime());
     }
-
+    public static String printList(List<OutputMessage> list){
+        return "[ "+ list.stream().map(OutputMessage::toString).collect(Collectors.joining("\n")) +" ]";
+    }
 }
