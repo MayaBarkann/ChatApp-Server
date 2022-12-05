@@ -1,17 +1,16 @@
 package chatApp.service;
 
+
 import chatApp.entities.Message;
 import chatApp.entities.MessageType;
 import chatApp.entities.Response;
 import chatApp.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -70,30 +69,7 @@ public class MessageService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Finds message between the given dates, sent/received by user (represented by user id), and writes them to a file.
-     * If the given start date is empty, minimal date and time is the earliest possible of LocalDateTime.
-     * If the given end date is empty, max date and time is the LocalDateTime.now()
-     *
-     * @param fileName - String, name of the file we want to write the messages to.
-     * @param userId -  int, id of the user who is the sender or the receiver of the messages we want to save.
-     * @param startDateArgument - Optional<LocalDateTime>, contains the minimal date and time of the messages we want to write to the file (or Optional.empty()).
-     * @param endDateArgument - Optional<LocalDateTime>, contains the max date and time of the messages we want to write to the file (or Optional.empty()).
-     * @return Response<File> object containing the File object representing the file to which the messaged were written.
-     */
-    public Response<File> exportUserMessages(String fileName, int userId, Optional<LocalDateTime> startDateArgument, Optional<LocalDateTime> endDateArgument) {
-        final LocalDateTime startDate, endDate;
-        if (!startDateArgument.isPresent()) startDate = LocalDateTime.MIN;
-        else startDate = startDateArgument.get();
-        if (!endDateArgument.isPresent()) endDate = LocalDateTime.now();
-        else endDate = endDateArgument.get();
-        List<Message> result = new ArrayList<>();
-        result.addAll(messageRepo.findBySenderId(userId));
-        result.addAll(messageRepo.findByReceiverId(userId));
-        result = result.stream().filter(message -> ServiceUtil.dateIsBetween(message.getTime(), startDate, endDate)).collect(Collectors.toList());
-        return FileWriter.writeListToFile(fileName, result);
 
-    }
 
     /**
      * Finds and returns a list of personal messages between specified sender and receiver.

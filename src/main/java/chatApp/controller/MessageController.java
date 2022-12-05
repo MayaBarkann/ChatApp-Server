@@ -8,11 +8,17 @@ import chatApp.controller.entities.OutputMessage;
 import chatApp.service.MessageService;
 import chatApp.service.PermissionService;
 
+
 import chatApp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -223,6 +229,31 @@ public class MessageController {
             }
         }
         return result;
+    }
+    /**
+     * Finds message between the given dates, sent/received by user (represented by user id), and writes them to a file.
+     * If the given start date is empty, minimal date and time is the earliest possible of LocalDateTime.
+     * If the given end date is empty, max date and time is the LocalDateTime.now()
+     *
+     * @param userId -  int, id of the user who is the sender or the receiver of the messages we want to save.
+     * @param startDateArgument - Optional<LocalDateTime>, contains the minimal date and time of the messages we want to write to the file (or Optional.empty()).
+     * @param endDateArgument - Optional<LocalDateTime>, contains the max date and time of the messages we want to write to the file (or Optional.empty()).
+     * @return Response<File> object containing the File object representing the file to which the messaged were written.
+     */
+    @GetMapping(value = "/exportMessages")
+    public void exportUserMessages(@RequestAttribute("userId") int userId, @RequestParam (value = "from",required = false) String startDateArgument, @RequestParam (value = "to",required = false) String  endDateArgument, HttpServletResponse response ) throws IOException {
+        String fileName = "messages.txt";
+        List<Message> result = new ArrayList<>();
+        Optional<LocalDateTime> startOptional = ControllerUtil.convertOffsetToLocalDateTime(startDateArgument);
+        Optional<LocalDateTime> endOptional = ControllerUtil.convertOffsetToLocalDateTime(endDateArgument);
+        result.addAll(messageService.loadPublicMessages(startOptional, endOptional));
+        result.addAll(messageService.getAllUserChannels(userId));
+        String outputString = getMessagesMapFromList(result).entrySet().stream().map(entry -> entry.getKey().toString() + " " + ControllerUtil.printList(entry.getValue())).collect(Collectors.joining("\n"));
+            response.setContentType("text/plain; charset=UTF-8");
+            response.setCharacterEncoding("UTF-8");
+            response.setHeader("Content-Disposition","attachment;filename="+fileName);
+            PrintWriter out = response.getWriter();
+            out.println(outputString);
     }
 
 }

@@ -66,9 +66,10 @@ public class OutputMessage {
 
     @Override
     public String toString() {
-        return "ChatMessage{" +
-                "sender='" + sender + '\'' +
-                ", content='" + content + '\'' +
-                '}';
+         String result = "Sender: " + sender;
+         if(receiver!=null)
+             result+=", Receiver: "+receiver;
+         result+=", Content: "+content+", Time: "+time;
+         return result;
     }
 }
