@@ -10,18 +10,16 @@ import chatApp.service.PermissionService;
 import chatApp.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit4.SpringRunner;
+
 
 import java.time.LocalDateTime;
 import java.util.Base64;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = SpringApp.class)
 public class UserControllerTests {
     @Autowired
