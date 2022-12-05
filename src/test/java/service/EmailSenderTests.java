@@ -2,7 +2,7 @@ package service;
 
 import chatApp.entities.Response;
 import chatApp.service.EmailSender;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
