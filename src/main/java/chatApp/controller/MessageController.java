@@ -143,7 +143,11 @@ public class MessageController {
         List<OutputMessage> result;
         result = messageService.getChannelMessages(senderId, reciverId)
                 .stream().sorted(Comparator.comparing(Message::getTime))
-                .map(message -> OutputMessage.createPrivateMessage(message, senderName, reciverName))
+                .map(message -> {
+                    if(message.getSenderId()==senderId)
+                        return OutputMessage.createPrivateMessage(message, senderName, reciverName);
+                    else return OutputMessage.createPrivateMessage(message, reciverName, senderName);
+                   })
                 .collect(Collectors.toList());
         return ResponseEntity.ok(result);
     }
