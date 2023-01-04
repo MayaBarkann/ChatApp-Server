@@ -9,6 +9,7 @@ public class OutputMessage {
     private String content;
     private String time;
     private String receiver;
+    private int id;
     private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 
     /**
@@ -19,7 +20,7 @@ public class OutputMessage {
      * @return - OutputMessage object, containing strings of the following data: sender id, content, date and time the message was sent.
      */
     public static OutputMessage createPublicMessage(Message message, String sender) {
-        return new OutputMessage(sender,message.getContent(), message.getTime().format(formatter), null);
+        return new OutputMessage(message.getId(), sender,message.getContent(), message.getTime().format(formatter), null);
     }
 
     /**
@@ -30,16 +31,20 @@ public class OutputMessage {
      * @return - OutputMessage object, containing strings of the following data: sender id, content, date and time the message was sent.
      */
     public  static OutputMessage createPrivateMessage(Message message, String sender, String receiver) {
-        return new OutputMessage(sender,message.getContent(), message.getTime().format(formatter), receiver);
+        return new OutputMessage(message.getId(), sender,message.getContent(), message.getTime().format(formatter), receiver);
     }
 
-    private OutputMessage(String sender, String content, String time, String receiver) {
+    private OutputMessage(int id,String sender, String content, String time, String receiver) {
+        this.id=id;
         this.sender = sender;
         this.content = content;
         this.time = time;
         this.receiver = receiver;
     }
 
+    public int getId() {
+        return id;
+    }
     public String getSender() {
         return sender;
     }

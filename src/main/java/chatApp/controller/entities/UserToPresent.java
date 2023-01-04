@@ -23,7 +23,7 @@ public class UserToPresent {
 
     /**
      * Creates and returns an object containing user data that can be exposed in requests and responses (without password)
-     * 
+     *
      * @param user - User object, containing all data of the user.
      * @return UserToPresent, contains only user data that can be exposed (without password).
      */
@@ -35,6 +35,10 @@ public class UserToPresent {
         this.username = username;
         this.email = email;
         this.userType = userType;
+    }
+
+    public UserType getUserType() {
+        return userType;
     }
 
     public String getUsername() {

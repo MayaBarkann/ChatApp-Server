@@ -167,7 +167,7 @@ public class MessageController {
     }
 
     /**
-     *
+     * get all messages from all specific user channels (private conversations).
      * @param userId the user id
      * @return all the private messages that the user has sent or received
      */
@@ -231,14 +231,14 @@ public class MessageController {
         return result;
     }
     /**
-     * Finds message between the given dates, sent/received by user (represented by user id), and writes them to a file.
+     * given id of a user, returns all the messages that he has sent or received in file.
      * If the given start date is empty, minimal date and time is the earliest possible of LocalDateTime.
      * If the given end date is empty, max date and time is the LocalDateTime.now()
      *
      * @param userId -  int, id of the user who is the sender or the receiver of the messages we want to save.
      * @param startDateArgument - Optional<LocalDateTime>, contains the minimal date and time of the messages we want to write to the file (or Optional.empty()).
      * @param endDateArgument - Optional<LocalDateTime>, contains the max date and time of the messages we want to write to the file (or Optional.empty()).
-     * @return Response<File> object containing the File object representing the file to which the messaged were written.
+     * @return server response with the file name and content.
      */
     @GetMapping(value = "/exportMessages")
     public void exportUserMessages(@RequestAttribute("userId") int userId, @RequestParam (value = "from",required = false) String startDateArgument, @RequestParam (value = "to",required = false) String  endDateArgument, HttpServletResponse response ) throws IOException {

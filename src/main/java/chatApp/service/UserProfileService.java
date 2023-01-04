@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 @Service
 public class UserProfileService {
@@ -71,14 +73,16 @@ public class UserProfileService {
      */
     private Response<UserProfile> uploadImage(UserProfile userProfile, String localPath){
         int id = userProfile.getId();
-        BlobId blobId = BlobId.of(BUCKET,Integer.toString(id));
-        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
+        BlobId blobId = BlobId.of(BUCKET,Integer.toString(id)+".jpg");
+        BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
+                .setAcl(new ArrayList<>(Arrays.asList(Acl.of(Acl.User.ofAllUsers(), Acl.Role.READER))))
+                .build();
         File fileToRead = new File(localPath);
         try{
             byte[] data = Files.readAllBytes(Paths.get(fileToRead.toURI()));
-            storage.create(blobInfo,data);
-            String profilePhotoUrl = String.format(URL_TEMPLATE,id);
-            userProfile.setImageUrl(profilePhotoUrl);
+
+            Blob blob = storage.create(blobInfo, data);
+            userProfile.setImageUrl(blob.getMediaLink());
 
             return Response.createSuccessfulResponse(userProfile);
 
